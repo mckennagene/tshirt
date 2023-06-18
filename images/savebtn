@@ -1,0 +1,5 @@
+<button id="save" onclick="downloadJSON()"
+            style="position: fixed; bottom: 20px; right: 80px; width: 50px; height: 50px; border-radius: 25px; background-color: rgb(61, 61, 61); color: rgb(255, 255, 255); font-size: 24px; font-weight: bold; text-align: center; line-height: 50px; box-shadow: rgb(0, 0, 0) 2px 2px 5px; z-index: 9999; user-select: none"">
+        <i class="fas fa-save"></i>
+    </button>
+ 

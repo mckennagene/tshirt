@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>T-Shirt Puzzle</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background: url(images/largeTile2.png) center center/cover no-repeat;
+        }
+
+        .container.grayed::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(200, 200, 200, 0.5);
+        }
+
+        .text {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 6rem;
+            color: #fff;
+            opacity: 0;
+            animation: slideUp 2s forwards;
+            animation-delay: 1s;
+            text-shadow: -2px -2px 0 #000,
+                2px -2px 0 #000,
+                -2px 2px 0 #000,
+                2px 2px 0 #000;
+        }
+
+
+        .text2 {
+            position: absolute;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            color: #fff;
+            opacity: 0;
+            animation: slideUp2 2s forwards;
+            animation-delay: 1s;
+            text-align: center;
+            width: 100%;
+            text-shadow: -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+        }
+
+        .link {
+            position: absolute;
+            bottom: -250px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            color: #0000ff;
+            opacity: 0;
+            animation: slideUp3 2s forwards;
+            animation-delay: 1s;
+            text-align: center;
+            width: 100%;
+            text-decoration: none !important;
+            padding: 0 5px;
+        }
+
+
+        @keyframes slideUp {
+            0% {
+                bottom: -50px;
+                opacity: 0;
+            }
+
+            50% {
+                bottom: calc(50% - 3rem);
+                opacity: 1;
+            }
+
+            100% {
+                bottom: calc(50% - 3rem);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp2 {
+            0% {
+                bottom: -200px;
+                opacity: 0;
+            }
+
+            50% {
+                bottom: calc(50% - 3rem);
+                opacity: 1;
+            }
+
+            100% {
+                bottom: calc(50% - 8rem);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp3 {
+            0% {
+                bottom: -200px;
+                opacity: 0;
+            }
+
+            50% {
+                bottom: calc(50% - 4rem);
+                opacity: 1;
+            }
+
+            100% {
+                bottom: calc(50% - 11rem);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="text"><span style="white-space:nowrap">T-shirt Puzzle</span></div>
+        <div class="text2">200 identical puzzle pieces, <br />no picture, no pattern</div>
+        <a href="index.html" class="link">Let's Go!</a>
+    </div>
+    <script>
+        // Wait for the text animation to complete
+        setTimeout(function () {
+            // Add a CSS class to the container element
+            document.querySelector('.container').classList.add('grayed');
+        }, 3000); // Adjust the timeout value to match the duration of the text animation
+    </script>
+</body>
+
+</html>

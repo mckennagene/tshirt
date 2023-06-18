@@ -1,0 +1,616 @@
+body {
+  height: 100%;
+  overflow-x: hidden;
+  touch-action: manipulation;
+  margin:0;
+  padding:0;
+  /*position: relative;  this was new with scoreboard */
+}
+
+#canvas-container {
+  display: flex;
+  border: 1px solid red;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  overflow: auto;
+}
+
+/* the puzzle javascript class will control canvas dimensions */
+canvas {
+  border: 1px solid black;
+}
+
+#scoreBoard {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  font-size: 24px;
+  display: none;
+  color: white;
+  border: 1px solid black;
+  padding: 10px;
+  /* Add 10 pixels of padding to the scoreboard */
+  background-color: grey;
+}
+
+a {
+  color: blue;
+  text-decoration: none;
+}
+
+#tray {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background-color: #333;
+  transition: height 0.5s ease-in-out;
+  overflow: hidden;
+  padding-top: 50px;
+  display: none;
+}
+
+#tray.show {
+  height: 175px;
+}
+
+#trayContent {
+  position: relative;
+  height: 100%;
+}
+
+#trayButtons {
+  position: absolute;
+  padding: 20px;
+  bottom: 50px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  transition: top 0.5s ease-in-out;
+}
+
+#trayButtons button {
+  margin: 0 0px;
+  padding: 2px 2px 2px 2px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  user-select: none;
+  display: none;
+  z-index: 999999;
+}
+
+
+/* Default styles for large screens */
+#trayButtons button img {
+  width: 65px;
+  height: auto;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  margin-right: 5px;
+  transition: width 0.5s ease-in-out;
+  background-clip: content-box;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-app-region: no-drag;
+}
+
+/* Styles for smaller screens */
+@media only screen and (max-width: 600px) {
+  #trayButtons button img {
+    width: 60px;
+  }
+
+  #tray.show #trayButtons button img {
+    width: 65px;
+  }
+}
+
+/* Styles for larger screens */
+@media only screen and (min-width: 601px) {
+  #trayButtons button img {
+    width: 65px;
+  }
+
+  #tray.show #trayButtons button img {
+    width: 100px;
+  }
+}
+
+/*
+#trayButtons button img {
+  width: 50px;
+  height: auto;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  margin-right: 5px;
+  transition: width 0.5s ease-in-out;
+  background-clip: content-box;
+  user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-app-region: no-drag;
+}
+
+@media only screen and (max-width: 600px) {
+  #trayButtons button img {
+    width: 10px;
+    height: auto;
+  }
+}
+
+@media only screen and (min-width: 601px) {
+  #trayButtons button img {
+    width: 50px;
+    height: auto;
+  }
+}
+
+
+#tray:not(.show) #trayButtons button img {
+  width: 65px;
+}
+
+#tray.show #trayButtons button img {
+  width: 100px;
+}
+*/
+
+
+#lowerTray {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  transition: bottom 0.5s ease-in-out;
+}
+
+#lowerTray button {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 2px;
+  background-color: rgb(61, 61, 61);
+  color: rgb(255, 255, 255);
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 50px;
+  box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 1);
+  z-index: 9999;
+  user-select: none;
+  display: block;
+  align-items: center;
+}
+
+#lowerTray button img {
+  width: 100%;
+  height: 100%;
+  box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 1);
+  transition: width 0.5s ease-in-out;
+  user-select: none;
+  object-fit: contain;
+}
+
+#lowerTray button i {
+  font-size: 24px;
+  line-height: 50px;
+}
+
+#loadLabel2 {
+  position: relative;
+  height: 100px;
+}
+
+#loadLabel {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: rgb(61, 61, 61);
+  color: rgb(255, 255, 255);
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 50px;
+  box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 1);
+  z-index: 9999;
+  user-select: none;
+  display: block;
+  margin-right: 10px;
+  align-items: center;
+  cursor: pointer;
+}
+
+#loadLabel:hover {
+  background-color: rgb(43, 43, 43);
+}
+
+#loadLabel i {
+  font-size: 24px;
+  line-height: 50px;
+}
+
+
+#toolTray {
+  position: fixed;
+  right: 120px;
+  width: 50px;
+  height: 50px;
+  top: calc(100% - 100px);
+  z-index: 9999;
+  display: none;
+  transition: top 0.5s ease-in-out;
+}
+
+#filesLabel {
+  /*position: absolute;
+  bottom: 20px;
+  right: 140px;*/
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #3d3d3d;
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 50px;
+  box-shadow: 2px 2px 5px #000;
+  z-index: 9999;
+  user-select: none;
+  display: none;
+}
+
+#filesLabel:hover {
+  cursor: pointer;
+}
+
+#filesLabel:focus-within {
+  outline: none;
+}
+
+#filesLabel input[type="file"] {
+  display: none;
+}
+
+
+#gearContainer {
+  position: fixed;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    bottom: 10px;
+    /*top: calc(100% - 100px);*/
+    z-index: 9999;
+    display: none;
+    transition: top 0.5s ease-in-out;
+}
+
+#gear {
+  position: fixed;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  bottom: 10px;
+  border-radius: 25px;
+  background-color: rgb(61, 61, 61);
+  color: rgb(255, 255, 255);
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 50px;
+  box-shadow: rgb(0, 0, 0) 2px 2px 5px;
+  user-select: none;
+}
+
+#trayToggle {
+  position: fixed;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: rgb(61, 61, 61);
+  color: rgb(255, 255, 255);
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 50px;
+  box-shadow: rgb(0, 0, 0) 2px 2px 5px;
+  user-select: none;
+}
+
+/*
+#tray.show #toolTray {
+  top: calc(100% - 200px);
+}
+
+#tray.show #trayToggle {
+  top: calc(200px - 25px);
+}
+*/
+/*
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+*/
+
+.level-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border: 2px solid #000;
+  z-index: 9999;
+  display: none;
+  text-align: center;
+  max-width: 85%;
+  height: auto;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+
+
+.level-dialog.show #canvas-container {
+  display: none;
+}
+
+.level-dialog.show {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+
+
+.level-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #ddd;
+  flex-grow: 1;
+  text-align: center;
+  height: 50px;
+  border-top: 2px solid black;
+  border-left: 2px solid black;
+  border-right: 2px solid black;
+  border-bottom: none;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 0 10px;
+}
+
+.tab:hover {
+  background-color: #ccc;
+}
+
+.tab.active {
+  background-color: #fff;
+}
+
+
+
+.level-content {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+
+.navigation-select {
+  font-size: 24px;
+  font-weight: bold;
+  width: auto;
+}
+
+@media only screen and (min-width: 600px) {
+  .level-text-image {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .level-text {
+    flex-basis: 50%;
+    text-align: left;
+  }
+
+  .level-image {
+    flex-basis: 50%;
+  }
+
+  .level-image img {
+    margin: auto;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .level-text-image {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .level-text {
+    order: 2;
+    text-align: left;
+  }
+
+  .level-image {
+    order: 1;
+  }
+}
+
+.ok-button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.ok-button-row div {
+  flex-grow: 1;
+}
+
+.ok-button {
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.table {
+  display: table;
+}
+
+.table-row {
+  border-spacing: 0 7px;
+}
+
+.table-done-row {
+  border-spacing: 0 7px;
+  display: flex;
+  justify-content:right;
+  padding-right:20px;
+  margin:20px;
+}
+.table-cell {
+  display: table-cell;
+  padding-left: 10px;
+}
+
+.table-cell settings {
+  display: table-cell;
+  padding-left: 10px;
+  width: 50px;
+}
+
+.table-cell-bold {
+  display: table-cell;
+  font-weight: bold;
+  width: auto;
+  min-width: 1.5em;
+}
+
+
+/** 
+ * for the flying finger animation
+ */
+.clickfinger {
+  position: absolute;
+  left: 10%;
+  width: 37%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.clickfinger img {
+  position: absolute;
+  top: 10%;
+  left: 30%;
+  width: 50px;
+  height: auto;
+  transform: translateY(-50%);
+  z-index: 12000;
+}
+
+.clickfingermove {
+  animation: clickFingerMoveImg 1.5s linear infinite;
+  /* ease-in-out */
+}
+
+@keyframes clickFingerMoveImg {
+  0% {
+    left: 30%;
+    transform: translateY(-50%);
+  }
+  20% {
+    left: 60%;
+    transform: translateY(-50%);
+  }
+  40% {
+    left: 80%;
+    transform: translateY(-50%);
+  }
+  60% {
+    left: 80%;
+    transform: translateY(-50%);
+  }
+  80% {
+    left: 60%;
+    transform: translateY(-50%);
+  }
+  100% {
+    left: 30%;
+    transform: translateY(-50%);
+  }
+}
+
+.settings {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 20px;
+  width: 100vw; 
+  height: 100vh;
+  background-color: #fff;
+  
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.settings-cell {
+  display: table-cell;
+  font-weight: bold;
+  width: 50px;
+  min-width: 50px;
+}
+
+.nobull {
+  list-style: none;
+}

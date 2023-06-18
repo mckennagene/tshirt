@@ -8,5 +8,7 @@ It also makes for an incredibly hard jigsaw puzzle. Trying to tile even a small 
 
 This interactive project gives you a hexagonal canvas on which to place, rotate, flip, copy, paste, drag t-shirt (or hat) shaped tiles around.  It also gives a series of lessons on how the tiling can be performed. Even though there is no pattern to the t-shirts, there is a pattern to a set of 4 geometric metatiles that can be overlaid on top of it. It's a beautiful dive into recursive substitional geometry. 
 
-Just open up the file 'welcome.html' and you are good to go.
+All self-contained html and javascript. Open up the file 'welcome.html' and you are good to go.
+
+https://www.mckennagene.com
 

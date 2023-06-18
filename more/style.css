@@ -1,0 +1,129 @@
+/* Set the body to full width and centered */
+body {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    background-image: url('t1.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+/*
+#mybody {
+    background-image:
+        linear-gradient(to bottom, rgba(245, 246, 252, 0.52) 0%, rgba(117, 19, 93, 0.73) 10%),
+        url('t1.png');
+    width: 80%;
+    height: 100px;
+    height: calc((100vh*.1));
+    background-size: cover;
+    color: white;
+    padding: 20px;
+} */
+
+
+.grid {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.row {
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+.row1,
+.row3 {
+    height: 250px;
+}
+
+.col1,
+.col3,
+.col4,
+.col6,
+.col7,
+.col9 {
+    flex-grow: 1;
+}
+
+
+.col2,
+.col5,
+.col8 {
+    width: 80%;
+    max-width: 800px;
+}
+
+.col2 { background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 100%);}
+.col4 { background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 100%);}
+.col6 { background: linear-gradient(to left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 100%);}
+.col8 { background: linear-gradient(to top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 100%); }
+
+.col1 {
+    background-image: radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.0) 100%);
+        background-position: bottom right;
+       /* background-size: 75%;*/
+}
+
+.col3 {
+    background-image: radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.0) 100%);
+    background-position: bottom left;
+    /* background-size: 75%;*/
+}
+
+.col7 {
+    background-image: radial-gradient(circle at top right, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.0) 100%);
+    background-position: top right;
+    /* background-size: 75%;*/
+}
+
+.col9 {
+    background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.0) 100%);
+    background-position: top left;
+    /* background-size: 75%;*/
+}
+
+.col5 {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+.cell {
+    box-sizing: border-box;
+    border: 0px solid black;
+}
+
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+section {
+    margin-top: 20px;
+}
+
+h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    max-width: 80%;
+}

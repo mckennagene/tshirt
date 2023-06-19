@@ -20,15 +20,26 @@ class Puzzle {
     static KITE_SIZE = 15;
 
     // these are indices in the color array
-    static palette = {
-        top: 'blue',
-        default: 'white',
-        bottom: 'white',
-        surround: 'SkyBlue',
-        disjoint: 'white',
-        sideKick: 'yellow',
-        background: 'seashell'
-    };
+    static palette = [
+        {
+            top: 'blue',
+            default: 'white',
+            bottom: 'white',
+            surround: 'SkyBlue',
+            disjoint: 'white',
+            sideKick: 'yellow',
+            background: 'seashell'
+        },
+        {
+            top: '#a32a22',
+            default: '#f4d3a8',
+            bottom: '#f4d3a8',
+            surround: '#e27531',
+            disjoint: '#f4d3a8',
+            sideKick: '#e4b33f',
+            background: 'white',
+        }
+    ];
 
     constructor(game) {
         this.game = game;
@@ -66,9 +77,7 @@ class Puzzle {
         this.setupEventListeners();
         this.browserHeight = document.documentElement.clientHeight;
         this.browserWidth = document.documentElement.clientWidth;
-        this.puzzleGoal;
-        this.puzzleHint;
-        this.tshirtColors = Puzzle.palette;
+        this.tshirtColors = Puzzle.palette[0];
         this.showBadNeighbors = false;
         this.showSurround = false;
         this.showSideKick = false;
@@ -81,6 +90,7 @@ class Puzzle {
 
         this.selection = new Selection(); // the set of every object selected so we don't have to ask them all all the time
         this.controls;
+        this.paletteIndex=0;
         this.newTilePause = false;
 
         // used for dragging, have to know where the drag starts
@@ -99,17 +109,8 @@ class Puzzle {
         // supertile alignment
         this.SHOW_PHANTOMS = true;
 
-        // draw some starting tshirts
-        // colors
-        this.backgroundColor = "#ffffff";
-        // tshirt colors
-
-        // be advised COLOR.OUTLINE and BACKGROUND defaults are indexes into this array
-        // the set provided here could be adjusted to whatever paleltte you want
-        //this.tshirtColors = ["white", "black", "grey", "red", "green", "blue", "yellow", "cyan", "magenta", "MediumSlateBlue"];
-
-        //this.resetTShirtData();
-
+        // this.backgroundColor = "#ffffff";
+        
         this.moveCycles = 0; // count # of mouse movements, quick hack.
         this.commonPointCallCount = 0;
         this.superTile = [];
@@ -137,7 +138,7 @@ class Puzzle {
         this.validateTShirtLocations();
     }
 
-    resetPuzzle(gridSize, buffer, zoom, palette, targets, goal, hint,
+    resetPuzzle(gridSize, buffer, zoom, palette, targets,
         showBadNeighbors, showSurround, showSideKick, showKites, autoDrawShape, autoDrawLevel, showHintsDefault,
         showMetaHints) {
         //console.log("Puzzle.resetPuzzle()");
@@ -161,8 +162,6 @@ class Puzzle {
         if (showMetaHints) { this.showMetaHints = showMetaHints; }
 
         this.targets = targets;
-        this.puzzleGoal = goal;
-        this.puzzleHint = hint;
         this.showBadNeighbors = showBadNeighbors;
         this.showSurround = showSurround;
         this.showSideKick = showSideKick;
@@ -2044,8 +2043,9 @@ class Puzzle {
                     this.zoom(999); // kind of a hack, special number to reset zoom to 1
                     break;
                 case "c":
-                    console.log("change color");
-                    tshirt.nextColor();
+                    this.paletteIndex++;
+                    this.tshirtColors=Puzzle.palette[this.paletteIndex % Puzzle.palette.length];
+                    this.fullRedraw();
                     break;
                 case "i":
                     console.log("selection:" + this.selection.logInfo());
@@ -2193,7 +2193,7 @@ class Puzzle {
     // define the download function
     downloadJSON() {
         const data = {
-            grid: { width: this.hexCenterCols, height: this.hexCenterRows },
+            grid: { width: this.hexCenterCols, height: this.hexCenterRows, borderBuffer: Puzzle.BORDER_BUFFER, zoomLevel: this.zoomLevel },
             tshirts: []
         };
 
@@ -2213,12 +2213,10 @@ class Puzzle {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }
-
+  
     uploadJSON(event) {
         var that = this; // store reference to this
         var files = event.target.files; // FileList object
-        // files is a FileList of File objects. List some properties.
-        var output = [];
         let f = "";
         for (var i = 0; f = files[i]; i++) {
             var reader = new FileReader();
@@ -2226,10 +2224,9 @@ class Puzzle {
             reader.onload = (function (theFile) {
                 return function (e) {
                     let json = JSON.parse(e.target.result);
-                    //console.log("the json data are:" + JSON.stringify(json));
-                    // assume we are successful now in loading the file, clear all old data
-                    console.log(JSON.stringify(json.grid));
-                    that.initializeDataStructures(json.grid, 1); // clear out all other data structures
+                    that.initializeDataStructures(json.grid, json.grid.zoomLevel); // clear out all other data structures
+                    Puzzle.BORDER_BUFFER = 0;
+                    if (json.grid.borderBuffer) { Puzzle.BORDER_BUFFER = json.grid.borderBuffer; } 
                     let newTs = TShirt.createTShirtsFromJSON(that, json.tshirts);
                     for (let t of newTs) { that.tshirts.add(t); }
                     that.validateTShirtLocations();
@@ -2343,11 +2340,15 @@ class Puzzle {
         return newKites;
     }
 
-    // we probably have to change that kitsoccuped to maintain a separate record of which phantoms are where
-    // the reason to record them at all is so they get redrawn at appropriate times
     kitesAreOccupied(tshirt, kitesData) {
-        for (const t of this.tshirts) {
-            if (t != tshirt && !t.selected) { if (t.hasKite(kitesData) && !t.phantom) { return t; } }
+        // this tshirt can only occupy kites at its location and neighboring locations
+        // so let's just check in the grid area +/- 1 around this 
+        for( let x = tshirt.gridX -1 ; x<=tshirt.gridX+1; x++ ) { 
+            for( let y = tshirt.gridY -1 ; y<=tshirt.gridY+1; y++ ) {
+                let t = this.getTShirtAtLocation( x,y ) ;
+                //  for (const t of this.tshirts) {
+                if( t && t != tshirt && !t.selected) { if (t.hasKite(kitesData) && !t.phantom) { return t; } }
+            }
         }
         return null;
     }

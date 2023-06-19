@@ -352,13 +352,13 @@ class Level {
                 badNeighbors: true, surroundColor: true, sideKickColor: true, autoDrawShape: "h", autoDrawLevel: 5
             },
             tools: ["addOne", "addCluster", "addSideKick"],
-            showHintsDefault: 2,
+            showHintsDefault: 2,  
             showMetaHints: 1,
             buffer: 0,
             },
             {   // Play
                 number: 21,
-                gridSize: { x: 150, y: 150 },
+                gridSize: { x: 100, y: 100 },
                 zoom: 0.5, 
                 controls: {
                     tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
@@ -367,7 +367,7 @@ class Level {
                 tools: ["addOne", "addCluster", "addSideKick"],
                 showHintsDefault: 2,
                 showMetaHints: 1,
-                buffer: 20,
+                buffer: 15,
             }
         ]; // end level data
     }

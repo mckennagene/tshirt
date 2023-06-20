@@ -61,15 +61,21 @@ class SuperTile {
             c.rotateCWNTimes(numRotations);
         }
     }
-
+    
+    // make this same call on my children, and their children all the way down
+    // seems like a small array and picking an index based on a modulus or something would be smarter
     rotateCWNTimes(n) {
-        // make this same call on my children, and their children all the way down
-        // seems like a small array and picking an index based on a modulus or something would be smarter
         if (this.level < 1) { return; }
-        //if (this.level == SuperTile.requestedLevels - 1) { console.log("."); }
         for (let c of this.childArray) { c.rotateCWNTimes(n); }
         // now rotate me that many times
         for (let i = 0; i < n; i++) { this.orientation = SuperTile.rotateCW(this.orientation); }
+        // now i'm done, pop up a level
+    }
+    rotateCCWNTimes(n) {
+        if (this.level < 1) { return; }
+        for (let c of this.childArray) { c.rotateCCWNTimes(n); }
+        // now rotate me that many times
+        for (let i = 0; i < n; i++) { this.orientation = SuperTile.rotateCCW(this.orientation); }
         // now i'm done, pop up a level
     }
 
@@ -275,7 +281,6 @@ class SuperTile {
         }
         return s;
     }
-
 
     static buildUpSuperTile(level = 3) {
 
@@ -677,10 +682,7 @@ class SuperTile {
 
     getSuperTileShapePoints() {
         if (this.name === "h") { return this.getHShapePoints(); }
-        else if (this.name === "p") {
-            let p = this.getPShapePoints();
-            return this.getPShapePoints();
-        }
+        else if (this.name === "p") { return this.getPShapePoints();  }
         else if (this.name === "f") { return this.getFShapePoints(); }
         else if (this.name === "t") { return this.getTShapePoints(); }
         else { return null; }

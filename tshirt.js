@@ -451,22 +451,20 @@ class TShirt {
         return set;
     }
 
-    // i will ask chatgpt for a more elegant way to do this when i reconnect
     hasKite(kites) {
         for (let i = 0; i < kites.length; i += 2) {
             for (let k of kites[i + 1]) {
-                let s = kites[i].x + "," + kites[i].y + ":" + k; // 1,1:2
+                let s = kites[i].x + "," + kites[i].y + ":" + k; // e.g. 5,6:2
                 for (let j = 0; j < this.kitesOccupied.length; j += 2) {
                     for (let l of this.kitesOccupied[j + 1]) {
                         let t = this.kitesOccupied[j].x + "," + this.kitesOccupied[j].y + ":" + l;
-                        //console.log("is " + s + " matching " + t );
-                        if (s == t) {
-                            return true;
-                        }
+                        if (s === t) { console.log("\t" + s + " === " + t); return true;  }
+                        else { console.log( "\t" + s + " !== " + t + " keep looking") ; }
                     }
                 }
             }
         }
+        console.log("no match");
         return false;
     }
 
@@ -492,26 +490,33 @@ class TShirt {
      * This method does not move a kite or change anything about which kites in the system
      * are currently occupied. It simply computes which kites would be occupied if a tshirt
      * were placed with the given parameters.
+     * 
+     * The kites are numbered around the hexagon like this.
+     *        ---------
+     *       /  3   2  \
+     *      /           \
+     *     / 4         1 \
+     *      \           /
+     *       \ 5     0 /
+     *        ---------
+     * 
      */
     kitesForPosition(gridX, gridY, heading, flip) {
         heading = Puzzle.normalizeDegrees(heading);
-        // get the primary hexagon center of this one
-        // draw the kites that should be on for it given it's rotation
-        // h should be heading in radians.
         const hex1 = { x: gridX, y: gridY };
         const hex1Kites = this.puzzle.rotateKites(heading, flip, [1, 2, 3, 4]);
         const hex2 = this.puzzle.findNeighboringHexagon(gridX, gridY, 0 + heading);
         let hex2Kites = this.puzzle.rotateKites(heading, flip, [0, 1]);
-        if (flip == TShirt.FLIP.BOTTOM) {
-            hex2Kites = this.puzzle.rotateKites(heading, flip, [4, 5])
-        };
+        if (flip == TShirt.FLIP.BOTTOM) {  hex2Kites = this.puzzle.rotateKites(heading, flip, [4, 5])  };
         let hex3 = this.puzzle.findNeighboringHexagon(gridX, gridY, -60 + heading);
         let hex3Kites = this.puzzle.rotateKites(heading, flip, [4, 5]);
         if (flip == TShirt.FLIP.BOTTOM) {
             hex3 = this.puzzle.findNeighboringHexagon(gridX, gridY, 60 + heading);
-
             hex3Kites = this.puzzle.rotateKites(heading, flip, [0, 1]);
         }
+        //console.log( "if tshirt: " + this.id + " were at " + gridX+","+gridY + " it would have kites: " + hex1.x +","+ hex1.y + "(" + hex1Kites +") " + 
+        //                                      hex2.x +","+ hex2.y + "(" + hex2Kites +") " +
+        //                                      hex3.x +","+ hex3.y + "(" + hex3Kites +")" );
         return [hex1, hex1Kites, hex2, hex2Kites, hex3, hex3Kites];
     }
 
@@ -629,9 +634,7 @@ class TShirt {
             ctx.fillStyle = this.color;
             let w = 2 + (this.selected ? 3 : 0);
             ctx.lineWidth = w;
-            if (this.phantom) {
-                 ctx.fillStyle = "lavender"; 
-                }
+            if (this.phantom) { ctx.fillStyle = "lavender";  } // was only used for debugging, generall we don't draw phantoms anyway.
             // this is used when we rattle, 
             if (fillColor) { ctx.fillStyle = fillColor; }
 
@@ -783,8 +786,6 @@ class TShirt {
      */
     computePoints(kites) {
         if (this.beingDragged) { return; } // don't draw if we are being dragged
-        //this.resetBoundingBox();//boundingBox.clear(); // don't do this here, do it only in computeoutline, assumption is we always do the outline no matter what
-        // h should be heading in radians.
         let h = -1 * Puzzle.degreesToRadians(this.head);
         // clear all the existing triangles used for mouse-click detection
         this.triangles = [];
@@ -843,7 +844,18 @@ class TShirt {
             ctx.closePath();
             ctx.stroke();
         }
-        /* draw midpoints
+
+        // label kite midpoints
+        ctx.fillStyle="black";
+        for (let i = 0 ; i < 6 ; i+=2 ) { 
+            let gridPt   = this.kitesOccupied[i];
+            let kites    = this.kitesOccupied[i+1];
+            let canvasPt = Puzzle.gridToCanvas(gridPt.x,gridPt.y,Puzzle.KITE_SIZE);
+            
+        //    ctx.fillText( i, this.kiteMidpoints[i].x, this.kiteMidpoints[i].y);
+        }
+
+        /*// draw midpoints and kite Numbers
         ctx.fillStyle = "red";
         for( let m = 0 ; m<this.kiteMidpoints.length ; m++ ) {
             const mid = this.kiteMidpoints[m];
@@ -852,15 +864,9 @@ class TShirt {
             //ctx.fillRect(mid.x-1,mid.y-1,3,3);
         }
         */
-
     }
 
     computeKites(x, y, kiteList) {
-        // console.log("computeKites");
-        // for debugging    red,      green,    blue,     yellow,   magenta,  cyan
-        //let orientation = 1
-        //if (this.flip == TShirt.FLIP.TOP) { orientation = 1; }
-        //else { orientation = -1; }
         let a = 0;
         // we actually have a world where we rotate everythign 90 degrees from the javascript default.
         let tr = Math.PI / 2; // a standard rotation to put in that was helpful for debugging
@@ -985,19 +991,12 @@ class TShirt {
      * @returns 
      */
     gridMove(dx, dy) {
-        //console.log("gridMove: move id:" + this.id + " from " + this.gridX + "," + this.gridY + " amt=" + dx + "," + dy 
-        //         + " heading=" + this.heading);
         this.surround = false;
+        
         // get the kites cover in this change
-        let newKites = this.kitesForPosition(this.gridX + dx, this.gridY + dy, this.heading, this.flip);
-        this.kitesOccupied = newKites; // 
-        // for now let the phantom's clear and occupy the location,
-        // but in puzzle.kitesOccupied, don't let a phantom get in the way of someone else landing there
-        // we probably have to change that kitsoccuped to maintain a separate record of which phantoms are where
-        // the reason to record them at all is so they get redrawn at appropriate times
-        //if( !this.phantom) {
-            this.puzzle.clearLocation(this.gridX, this.gridY, this);
-        //}
+        this.puzzle.clearLocation(this.gridX, this.gridY, this); // clear the old location including the old kites occupied
+        this.puzzle.clearKiteLocations( this ); // clear the old kites occupied
+        this.kitesOccupied = this.kitesForPosition(this.gridX + dx, this.gridY + dy, this.heading, this.flip); 
         
         this.gridX += dx;
         this.gridY += dy;
@@ -1016,7 +1015,6 @@ class TShirt {
 
         // update points and the new bbox will compute during this.
         this.computePoints(this.kitesForThisPosition());
-        //console.log(this.id+ " computing outline default for grid " + this.gridX + "," + this.gridY);
         this.computeOutlineDefault();
     }
 
@@ -1025,8 +1023,8 @@ class TShirt {
         this.surround = false;
         degrees = Puzzle.normalizeDegrees(degrees);
         const newheading = Puzzle.normalizeDegrees(this.heading + degrees);
-        const newKites = this.kitesForPosition(this.gridX, this.gridY, newheading, this.flip);
-        this.kitesOccupied = newKites;
+        //const newKites = this.kitesForPosition(this.gridX, this.gridY, newheading, this.flip);
+        //this.kitesOccupied = newKites;
         this.heading = newheading;
     }
 
@@ -1035,8 +1033,8 @@ class TShirt {
         this.surround = false;
         let newFlip = TShirt.FLIP.BOTTOM;
         if (this.flip == TShirt.FLIP.BOTTOM) { newFlip = TShirt.FLIP.TOP; }
-        let newKites = this.kitesForPosition(this.gridX, this.gridY, this.heading, newFlip);
-        this.kitesOccupied = newKites;
+        //let newKites = this.kitesForPosition(this.gridX, this.gridY, this.heading, newFlip);
+        //this.kitesOccupied = newKites;
         this.flip = newFlip;
         this.color = this.flip === TShirt.FLIP.TOP ? this.puzzle.tshirtColors.top : this.puzzle.tshirtColors.bottom;
         // if you are a top, you can't be a surround or have another top that you surround

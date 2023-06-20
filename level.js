@@ -44,7 +44,7 @@ class Level {
         },
         {   // flip
             number: 3,
-            gridSize: { x: 10, y: 10 }, 
+            gridSize: { x: 10, y: 10 },
             controls: { tray: "open", rotate: "on", flip: "on", badNeighbors: false, surroundColor: false, sideKickColor: false },
             tools: ["addOne"],
             //levelGoal: 'drag, rotate and flip tshirts to fit into the red outlines',
@@ -65,13 +65,13 @@ class Level {
         }, {
             // good job
             number: 4,
-            gridSize: { x: 10, y: 16 }, 
+            gridSize: { x: 10, y: 16 },
             controls: { tray: "open", play: "skip", rotate: "on", flip: "on", gear: "on", zoom: "on", badNeighbors: false, surroundColor: false, sideKickColor: false },
             tools: ["addOne"],
         },
         {   // bad pairings
             number: 5,
-            gridSize: { x: 18, y: 8 }, 
+            gridSize: { x: 18, y: 8 },
             controls: { tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", badNeighbors: true, surroundColor: false, sideKickColor: false },
             tools: ["addOne", "hint"],
             badNeighbors: 6,
@@ -92,7 +92,7 @@ class Level {
         },
         {   // congrats
             number: 6,
-            gridSize: { x: 24, y: 16 }, 
+            gridSize: { x: 24, y: 16 },
             controls: { tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", play: "skip", badNeighbors: true, surroundColor: false, sideKickColor: false },
             tools: ["addOne", "hint"],
             badNeighbors: 0,
@@ -114,7 +114,7 @@ class Level {
         },
         {   // the cluster
             number: 8,
-            gridSize: { x: 10, y: 8 }, 
+            gridSize: { x: 10, y: 8 },
             controls: { tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", badNeighbors: true, surroundColor: true, sideKickColor: false },
             tools: ["addOne", "hint"],
             //surround: 3,
@@ -132,7 +132,7 @@ class Level {
         },
         {   // the multi-cluster
             number: 9,
-            gridSize: { x: 14, y: 8 }, 
+            gridSize: { x: 14, y: 8 },
             controls: {
                 tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
@@ -154,7 +154,7 @@ class Level {
         },
         {   // the buddies
             number: 10,
-            gridSize: { x: 10, y: 7 }, 
+            gridSize: { x: 10, y: 7 },
             controls: {
                 tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
@@ -202,7 +202,7 @@ class Level {
         },
         {   // fylfot
             number: 12,
-            gridSize: { x: 18, y: 12 }, 
+            gridSize: { x: 18, y: 12 },
             controls: {
                 play: "skip", tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
@@ -249,7 +249,7 @@ class Level {
         },
         {   // Those Little Arrows
             number: 15,
-            gridSize: { x: 15, y: 10 }, 
+            gridSize: { x: 15, y: 10 },
             controls: {
                 tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true, play: "skip",
@@ -267,7 +267,7 @@ class Level {
         },
         {   // Small Triangle to Large Triangle Scaling
             number: 16,
-            gridSize: { x: 15, y: 10 }, 
+            gridSize: { x: 15, y: 10 },
             controls: {
                 tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
@@ -303,7 +303,7 @@ class Level {
         },
         {   // Parallelogram Scaling
             number: 18,
-            gridSize: { x: 20, y: 16 }, 
+            gridSize: { x: 20, y: 16 },
             controls: {
                 tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
@@ -323,7 +323,7 @@ class Level {
         },
         {   // Fylfot Scaling
             number: 19,
-            gridSize: { x: 20, y: 16 }, 
+            gridSize: { x: 20, y: 16 },
             controls: {
                 tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
@@ -346,29 +346,29 @@ class Level {
             // 600x600 was big enough for an h6, but h6 is very slow.
             // we will stick with h5 for the final
             gridSize: { x: 260, y: 260 },
-            zoom: 0.1, // when drawing at very large size you want the zoom level very low initially
+            zoom: 2, // when drawing at very large size you want the zoom level very low initially
             controls: {
                 tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true, autoDrawShape: "h", autoDrawLevel: 5
             },
             tools: ["addOne", "addCluster", "addSideKick"],
-            showHintsDefault: 2,  
+            showHintsDefault: 2,
             showMetaHints: 1,
             buffer: 0,
+        },
+        {   // Play
+            number: 21,
+            gridSize: { x: 100, y: 100 },
+            zoom: 0.5,
+            controls: {
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
+                badNeighbors: true, surroundColor: true, sideKickColor: true,
             },
-            {   // Play
-                number: 21,
-                gridSize: { x: 100, y: 100 },
-                zoom: 0.5, 
-                controls: {
-                    tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
-                    badNeighbors: true, surroundColor: true, sideKickColor: true, 
-                },
-                tools: ["addOne", "addCluster", "addSideKick"],
-                showHintsDefault: 2,
-                showMetaHints: 1,
-                buffer: 15,
-            }
+            tools: ["addOne", "addCluster", "addSideKick"],
+            showHintsDefault: 2,
+            showMetaHints: 1,
+            buffer: 15,
+        }
         ]; // end level data
     }
     getData() { return this.data; }

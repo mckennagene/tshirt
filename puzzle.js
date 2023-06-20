@@ -51,6 +51,7 @@ class Puzzle {
         this.hexCenterCols = 10;
         this.hexCenterRows = 10;
         this.hexTShirts = new Array(this.hexCenterCols);
+        this.hexKites = new Array(this.hexCenterCols + 1);
         this.hexPhantomTShirts = new Array(this.hexCenterCols);
 
         this.canvas = document.getElementById('puzzle');
@@ -90,7 +91,7 @@ class Puzzle {
 
         this.selection = new Selection(); // the set of every object selected so we don't have to ask them all all the time
         this.controls;
-        this.paletteIndex=0;
+        this.paletteIndex = 0;
         this.newTilePause = false;
 
         // used for dragging, have to know where the drag starts
@@ -110,7 +111,7 @@ class Puzzle {
         this.SHOW_PHANTOMS = true;
 
         // this.backgroundColor = "#ffffff";
-        
+
         this.moveCycles = 0; // count # of mouse movements, quick hack.
         this.commonPointCallCount = 0;
         this.superTile = [];
@@ -429,6 +430,10 @@ class Puzzle {
         for (let i = 0; i < this.hexCenterCols; i++) {
             this.hexTShirts[i] = new Array(this.hexCenterRows);
             this.hexPhantomTShirts[i] = new Array(this.hexCenterRows);
+            this.hexKites[i] = new Array(this.hexCenterRows + 1);
+            for (let j = 0; j < this.hexCenterRows + 1; j++) {
+                this.hexKites[i][j] = new Array(6); // 6 kites per hexagonal grid unit
+            }
         }
     }
 
@@ -438,21 +443,55 @@ class Puzzle {
             return;
         }
         //console.log("Puzzle.recordLocation - recording location " + x + "," + y + " for tshirt " + tshirt.id);
-        if (!tshirt.phantom) { this.hexTShirts[x][y] = tshirt; }
-        else { this.hexPhantomTShirts[x][y] = tshirt; }
+        if (!tshirt.phantom) {
+            this.hexTShirts[x][y] = tshirt;
+            // record which kites are occupied by this t-shirt
+            for (let i = 0; i < tshirt.kitesOccupied.length; i += 2) {
+                let gridPt = tshirt.kitesOccupied[i];
+                let kites = tshirt.kitesOccupied[i + 1];
+                for (let j = 0; j < kites.length; j++) {
+                    this.hexKites[gridPt.x][gridPt.y][kites[j]] = tshirt;
+                    //console.log("the location " + gridPt.x + "," + gridPt.y + "," + kites[j] + " is now taken by tshirt " + tshirt.id);
+                }
+            }
+        }
+        else {
+            this.hexPhantomTShirts[x][y] = tshirt;
+        }
     }
     // ensure that the tshirt passed is no longer recorded at the location.
     // possibly another tshirt is already there due to a group move
     clearLocation(x, y, tshirt) {
         if (!tshirt.phantom) {
-            if (this.hexTShirts[x][y] === tshirt) { this.hexTShirts[x][y] = null; }
+            if (this.hexTShirts[x][y] === tshirt) { this.hexTShirts[x][y] = null; } // clear the basic location
         } else {
             if (this.hexPhantomTShirts[x][y] === tshirt) { this.hexPhantomTShirts[x][y] = null; }
         }
         //else { console.log("did not clear " + x + "," + y); }
     }
+
+    clearKiteLocations(tshirt) {
+        // clear the detailed kite occupancy
+        if (tshirt.kitesOccupied != null) {
+            for (let i = 0; i < tshirt.kitesOccupied.length; i += 2) {
+                const gridPt = tshirt.kitesOccupied[i];
+                const kites = tshirt.kitesOccupied[i + 1];
+                if (gridPt != null && kites != null) {
+                    for (let j = 0; j < kites.length; j++) {
+                        if (this.hexKites[gridPt.x][gridPt.y][kites[j]] === tshirt) {
+                            this.hexKites[gridPt.x][gridPt.y][kites[j]] = null;
+                            //console.log("the location " + gridPt.x + "," + gridPt.y + "," + kites[j] + " is now free");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     clearTShirtLocation(tshirt) {
         if (!this.SUPERTILE_DRAW_SUPPRESSION) {
+            this.clearLocation(tshirt.gridX, tshirt.gridY, tshirt);
+        }/*
             if (!tshirt.phantom) {
                 if (this.hexTShirts[tshirt.gridX][tshirt.gridY] === tshirt) {
                     this.hexTShirts[tshirt.gridX][tshirt.gridY] = null;
@@ -465,6 +504,7 @@ class Puzzle {
             }
         }
         //else { console.log("did not clear " + tshirt.gridX + "," + tshirt.gridY); }
+        */
     }
 
 
@@ -492,7 +532,7 @@ class Puzzle {
             let kites = t.kitesForThisPosition();
             let allowable = true;
             //            for (let kite of kites) {
-            if (this.kitesAreOccupied(t, kites)) {
+            if (this.areKitesOccupied(t, kites)) {
                 //console.log("Tshirt " + tshirt.id + " is overlapping another tshirt");
                 toRemove.add(t);
                 allowable = false;
@@ -614,6 +654,8 @@ class Puzzle {
                     }
                 }
         */
+
+        this.drawSuperTiles(this.superTileRoot);
 
         // draw a rectangle around any workareas that were debugOn, helps us see where specific bounding boxes are
         for (let wa of workAreas) {
@@ -790,13 +832,13 @@ class Puzzle {
             this.ctx.beginPath();
 
             this.ctx.moveTo(0, 0);
-            this.ctx.fillText("0", 0, 0);
+            //this.ctx.fillText("0", 0, 0);
 
             for (let i = 0; i < pts.path.length; i += 2) {
                 this.ctx.translate(pts.path[i], 0);
                 this.ctx.rotate(pts.path[i + 1]);
                 this.ctx.lineTo(0, 0);
-                this.ctx.fillText((i + 2) / 2, 0, 0);
+                //this.ctx.fillText((i + 2) / 2, 0, 0);
             }
 
             this.ctx.closePath();
@@ -810,10 +852,10 @@ class Puzzle {
             this.ctx.beginPath();
 
             this.ctx.moveTo(pts.specificPoints[0].x, pts.specificPoints[0].y);
-            this.ctx.fillText("0", 0, 0);
+            //this.ctx.fillText("0", 0, 0);
             for (let i = 1; i < pts.specificPoints.length; i++) {
                 this.ctx.lineTo(pts.specificPoints[i].x, pts.specificPoints[i].y);
-                this.ctx.fillText((i + 1), 0, 0);
+                //this.ctx.fillText((i + 1), 0, 0);
             }
             this.ctx.closePath();
             this.ctx.stroke();
@@ -984,7 +1026,7 @@ class Puzzle {
                 canAllMove = false;
 
             }
-            if (this.kitesAreOccupied(tshirt, kites)) {
+            if (this.areKitesOccupied(tshirt, kites)) {
                 canAllMove = false;
                 blockingTs.add(tshirt);
                 // console.log("no work:" + tshirt.id + " @ " + x + "," + y + " heading " + h + " flip " + f);
@@ -1034,7 +1076,7 @@ class Puzzle {
 
             // is new position occupied by another?
             const kites = tshirt.kitesForPosition(newGrid.x, newGrid.y, tshirt.heading + dheading, tshirt.flip);
-            const blockT = this.kitesAreOccupied(tshirt, kites);
+            const blockT = this.areKitesOccupied(tshirt, kites);
             if (blockT) { blockingTs.add(blockT); }
         }
 
@@ -1081,12 +1123,17 @@ class Puzzle {
         Puzzle.addToWorkAreas(workAreas, this.selection.generateBBox());
 
         if (!this.SUPERTILE_DRAW_SUPPRESSION) {
+            if( this.superTileRoot ) { 
+                if (dheading == -60) { this.superTileRoot.rotateCWNTimes(1); }
+                else { this.superTileRoot.rotateCCWNTimes(1); } 
+            } 
             this.redoWorkAreas(workAreas);
             this.completedMove();
         }
     }
 
     isGridMoveValid(dx, dy) {
+        console.log("is grid move valid");
         if (this.selection.size() == 0) { return; }
         // now we have to move all of them together or none at all. 
         const keyTshirt = this.selection.getMinSelection();
@@ -1102,19 +1149,16 @@ class Puzzle {
             }
 
             // is the new grid position in bounds?
-            if (!this.isInGridBounds(tshirt, dx, dy + yadjust)) {
-                return false;
-            }
+            if (!this.isInGridBounds(tshirt, dx, dy + yadjust)) { return false; }
 
             // is new position occupied by another?
             const kites = tshirt.kitesForPosition(tshirt.gridX + dx, tshirt.gridY + dy + yadjust, tshirt.heading, tshirt.flip);
-            const blockT = this.kitesAreOccupied(tshirt, kites);
+            const blockT = this.areKitesOccupied(tshirt, kites);
             if (blockT) { blockingTs.add(blockT); }
         }
+        console.log("done checking result is blockingTs.size=" + blockingTs.size);
         if (blockingTs.size > 0) {
-            for (let b of blockingTs) {
-                b.rattle(this.showSurround, this.showSideKick);
-            }
+            for (let b of blockingTs) { b.rattle(this.showSurround, this.showSideKick); }
             return false;
         }
         else { return true; }
@@ -1153,6 +1197,7 @@ class Puzzle {
             Puzzle.addToWorkAreas(workAreas, this.selection.generateBBox());
         }
         for (const tshirt of this.selection.getSelection()) {
+            //console.log(".");
             let yadjust = 0;
             if (dy === 0 && Math.abs(dx) % 2 != 0 && tshirt.onEvenColumn() != keyStart) {
                 if (!tshirt.onEvenColumn()) { yadjust = +1; }  // if you go from odd to even, you go up
@@ -1167,16 +1212,14 @@ class Puzzle {
             // generally with arrow keys we only move by 1 in one direction and so we don't need to 
             // add another work area to clear and draw, it will fit within the original, but for debugging
             // we sometimes move by more so this is handy.
-
-            if (!this.SUPERTILE_DRAW_SUPPRESSION) {
-                if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-                    Puzzle.addToWorkAreas(workAreas, this.selection.generateBBox());
-                }
-                this.redoWorkAreas(workAreas);
-                this.completedMove();
-            }
         }
-
+        if (!this.SUPERTILE_DRAW_SUPPRESSION) {
+            if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+                Puzzle.addToWorkAreas(workAreas, this.selection.generateBBox());
+            }
+            this.redoWorkAreas(workAreas);
+            this.completedMove();
+        }
     }
     onScroll(event) { this.boundingRect = this.canvas.getBoundingClientRect(); }
     onResize(event) { this.zoom(0); } // resets the canvas size, xoffset, yoffset, and boundingRect, etc.
@@ -1508,22 +1551,15 @@ class Puzzle {
         }
         // if level==1 we don't get here due to the return above, so for levels above 1 now ...
         if (st.children) {
-            //console.log(st.fullId + " " + st.name + "/" + st.level + " has " + st.totalChildren + " children");
-            for (const child of st.childArray) {
-                this.autoDrawSuperTile(child, startX, startY);
-            }
+            for (const child of st.childArray) { this.autoDrawSuperTile(child, startX, startY); }
         } else { console.log("ERROR " + st.id + " " + st.name + "/" + st.level + " no children to do"); return; } // shouldn't ever see
         // done with children, do parent level stuff
-        //console.log(st.id + " " + st.name + "/" + st.level + " " + st.totalChildren + " children done, parental duties next");
         this.higherLevelRotateAndMove(st);
         if (st.level > 2) {
             this.selection.clear();
-            for (const t of st.getAllTShirts()) {
-                if (t.phantom) { this.selection.add(t, false); }
-            }
+            for (const t of st.getAllTShirts()) { if (t.phantom) { this.selection.add(t, false); } }
             this.deleteSelected();
         }
-        //console.log("ending autoDrawSuperTile " + st.id + " " + st.name + "/" + st.level);
     }
 
     // when we hit this at level2, all of the children of level1 have been created (all the leave-level t-shirts)
@@ -1764,12 +1800,15 @@ class Puzzle {
 
     // define a function to find the number of points in common between two sets of T-shirts
     countCommonPointsInSets(set1, tshirt2, reviewedMap) { //set2) {
+
         let count = 0;
         for (const tshirt1 of set1) {
             if (tshirt1 != tshirt2) {
                 const keyPair = Puzzle.getPairKey(tshirt1, tshirt2);
                 if (!reviewedMap[keyPair]) {
                     reviewedMap[keyPair] = true;
+                    // if their grid coordinates are off by more than 1 in any dimension they can't have points in common
+                    //if( Math.abs(tshirt1.gridX - tshirt2.gridX) > 1 || Math.abs(tshirt1.gridY - tshirt2.gridY > 1 )) { continue; }
                     const points1 = tshirt1.getPoints();
                     const points2 = tshirt2.getPoints();
                     count += this.getCommonPoints(points1, points2).length;
@@ -1780,9 +1819,6 @@ class Puzzle {
     }
 
 
-    isContiguousWithSelection(test, reviewedMap) {
-        return this.countCommonPointsInSets(this.selection.getSelection(), test, reviewedMap) >= 1;
-    }
 
     inBounds(x, y) {
         return true;
@@ -1899,7 +1935,7 @@ class Puzzle {
                 break;
             }
             let kites = tshirt.kitesForPosition(tshirt.gridX, tshirt.gridY, tshirt.heading, tshirt.flip);
-            let blockT = this.kitesAreOccupied(tshirt, kites);
+            let blockT = this.areKitesOccupied(tshirt, kites);
             if (blockT) {
                 canAllMove = false;
                 blockingTs.add(blockT);
@@ -2044,7 +2080,7 @@ class Puzzle {
                     break;
                 case "c":
                     this.paletteIndex++;
-                    this.tshirtColors=Puzzle.palette[this.paletteIndex % Puzzle.palette.length];
+                    this.tshirtColors = Puzzle.palette[this.paletteIndex % Puzzle.palette.length];
                     this.fullRedraw();
                     break;
                 case "i":
@@ -2115,16 +2151,91 @@ class Puzzle {
         this.selection.clear(); // put this after redoWorkAreas so that we can do a neighbor relationship check on those deleted
     }
 
-    // select the one clicked on and all contiguous to it
+    /**
+     * 
+     * this method will start with a given selection. for each tshirt in the selection
+     * it will find any t-shirts that have a neighboring kite. 
+     * 
+     * another tshirt is a neighbor if both tshirts have consecutive kites in the same hexagonal cell
+     * for example, if tshirt 1 and tshirt 2 both have kites in hexagonal cell 3,4 
+     * and tshirt 1 has kites 0,1 and tshirt 2 has kites 2,3 then they are neighbors
+     * because one has kite 3,4:1 and the other has kite 3,4:2 
+     * 
+     */
     onDoubleClick(event) {
+        console.time("onDoubleClick");
+        // for every t-shirt in the selection, find its neighbors
+        for (let t of this.selection.getSelection()) {
+            this.selectNeighbors(t);
+        }
+        if (this.selection.size() > 0) {
+            this.redoWorkAreas([this.selection.generateBBox()]);
+            this.completedMove();
+        }
+        console.timeEnd("onDoubleClick");
+    }
+
+    selectNeighbors(t) {
+        for (let i = 0; i < t.kitesOccupied.length; i += 2) {
+            const gridPt = t.kitesOccupied[i];
+            const kites = t.kitesOccupied[i + 1];
+            // all the ways in which two kites in the same, or neighboring, hexagons can touch each other
+            for (let k = 0; k < kites.length; k++) {
+                let kite = kites[k];
+                // even columns are "higher" so if you are on an even column, "above and right" or "above and left" yadjust=-1 else 0
+                let yabove = (gridPt.x % 2 == 0) ? -1 : 0;
+                let ybelow = (gridPt.x % 2 == 0) ? 0 : 1;
+                this.addNeighborIfExists(gridPt.x, gridPt.y, (kite + 1) % 6, t);
+                this.addNeighborIfExists(gridPt.x, gridPt.y, (kite + 5) % 6, t);
+                if (kite == 2) {
+                    this.addNeighborIfExists(gridPt.x, gridPt.y - 1, 0, t);  // is there a neighbor directly above with 0   
+                    this.addNeighborIfExists(gridPt.x + 1, gridPt.y + yabove, 4, t);  // is there a neighbor "above" and to the right with 4
+                }
+                else if (kite == 3) {
+                    this.addNeighborIfExists(gridPt.x, gridPt.y - 1, 5, t);  // is there a neighbor directly above with 5
+                    this.addNeighborIfExists(gridPt.x - 1, gridPt.y + yabove, 1, t);  // is there a neighbor "above" and to the left with 1
+                }
+                else if (kite == 0) {
+                    this.addNeighborIfExists(gridPt.x, gridPt.y + 1, 2, t);  // is there a neighbor directly below with 2
+                    this.addNeighborIfExists(gridPt.x + 1, gridPt.y + ybelow, 4, t);  // is there a neighbor "below" and to the right with 4
+                }
+                else if (kite == 5) {
+                    this.addNeighborIfExists(gridPt.x, gridPt.y + 1, 3, t);  // is there a neighbor directly below with 3
+                    this.addNeighborIfExists(gridPt.x - 1, gridPt.y + ybelow, 1, t);  // is there a neighbor "below" and to the left with 1
+                }
+                else if (kite == 1) {
+                    this.addNeighborIfExists(gridPt.x + 1, gridPt.y + ybelow, 3, t);  // is there a neighbor "below" and to the right with 3
+                    this.addNeighborIfExists(gridPt.x + 1, gridPt.y + yabove, 5, t);  // is there a neighbor "above" and to the right with 5
+                }
+                else if (kite == 4) {
+                    this.addNeighborIfExists(gridPt.x - 1, gridPt.y + ybelow, 2, t);  // is there a neighbor "below" and to the left with 2
+                    this.addNeighborIfExists(gridPt.x - 1, gridPt.y + yabove, 0, t);  // is there a neighbor "above" and to the left with 0
+                }
+            }
+        }
+    }
+
+    addNeighborIfExists(x, y, kite, t) {
+        if (x >= 0 && x <= this.hexCenterCols && y >= 0 && y <= this.hexCenterRows) {
+            const neighbor = this.hexKites[x][y][kite];
+            if (neighbor != null && neighbor != t && !neighbor.phantom && !neighbor.selected) {
+                this.selection.add(neighbor);  // add to selection (and prevent infinite recursion)
+                this.selectNeighbors(t);  // recurse to find neighbors of the neighbor
+            }
+        }
+    }
+
+    // select the one clicked on and all contiguous to it
+    onDoubleClickOld(event) {
         // Inelegant: we have to keep going through all of them until you stop adding more new ones.
         // is there a better way?
+        console.time("onDoubleClick");
         let size = this.selection.size();
         const reviewedMap = {};
         do {
             size = this.selection.size();
             for (const t of this.tshirts) {
-                if (!this.selection.getSelection().has(t)) {
+                if (!this.selection.getSelection().has(t)) { // if we haven't already selected it
                     if (this.isContiguousWithSelection(t, reviewedMap)) { this.selection.add(t); }
                 }
             }
@@ -2132,7 +2243,13 @@ class Puzzle {
         while (size != this.selection.size());
         this.redoWorkAreas([this.selection.generateBBox()]);
         this.completedMove();
+        console.timeEnd("onDoubleClick");
     }
+
+    isContiguousWithSelection(testTShirt, reviewedMap) {
+        return this.countCommonPointsInSets(this.selection.getSelection(), testTShirt, reviewedMap) >= 1;
+    }
+
 
     zoomIn() { this.zoom(1); }
     zoomOut() { this.zoom(-1); }
@@ -2213,7 +2330,7 @@ class Puzzle {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }
-  
+
     uploadJSON(event) {
         var that = this; // store reference to this
         var files = event.target.files; // FileList object
@@ -2226,7 +2343,7 @@ class Puzzle {
                     let json = JSON.parse(e.target.result);
                     that.initializeDataStructures(json.grid, json.grid.zoomLevel); // clear out all other data structures
                     Puzzle.BORDER_BUFFER = 0;
-                    if (json.grid.borderBuffer) { Puzzle.BORDER_BUFFER = json.grid.borderBuffer; } 
+                    if (json.grid.borderBuffer) { Puzzle.BORDER_BUFFER = json.grid.borderBuffer; }
                     let newTs = TShirt.createTShirtsFromJSON(that, json.tshirts);
                     for (let t of newTs) { that.tshirts.add(t); }
                     that.validateTShirtLocations();
@@ -2340,14 +2457,17 @@ class Puzzle {
         return newKites;
     }
 
-    kitesAreOccupied(tshirt, kitesData) {
-        // this tshirt can only occupy kites at its location and neighboring locations
-        // so let's just check in the grid area +/- 1 around this 
-        for( let x = tshirt.gridX -1 ; x<=tshirt.gridX+1; x++ ) { 
-            for( let y = tshirt.gridY -1 ; y<=tshirt.gridY+1; y++ ) {
-                let t = this.getTShirtAtLocation( x,y ) ;
-                //  for (const t of this.tshirts) {
-                if( t && t != tshirt && !t.selected) { if (t.hasKite(kitesData) && !t.phantom) { return t; } }
+    areKitesOccupied(tshirt, kitesData) {
+        // get a tshirt (if it exists) at any of the kitesData points. If there is one, ensure it isn't a phantom
+        // and that it isn't selected, or specifically the tshirt passed (which seems like it would be selected so do we need tshirt passed?)
+        for (let i = 0; i < kitesData.length; i += 2) {
+            let gridPt = kitesData[i];
+            let kites = kitesData[i + 1];
+            for (let j = 0; j < kites.length; j++) {
+                let t = this.hexKites[gridPt.x][gridPt.y][kites[j]];
+                if (t != null && t != tshirt && !t.phantom && !t.selected) {
+                    return t;
+                }
             }
         }
         return null;

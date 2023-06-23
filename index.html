@@ -23,6 +23,13 @@
                 <button id="addCluster"><img src="images/H.png" title="Add Cluster"></button>
                 <button id="addSideKick"><img src="images/SK.png" title="Add Buddy Pair"></button>
 
+                <button id="st0"><img id="st0img" src="images/B.png" title="tshirts"></button>
+                <button id="st1"><img id="st1img" src="images/1.png" title="level 1"></button>
+                <button id="st2"><img id="st2img" src="images/2.png" title="level 2"></button>
+                <button id="st3"><img id="st3img" src="images/3.png" title="level 3"></button>
+                <button id="st4"><img id="st4img" src="images/4.png" title="level 4"></button>
+                <button id="st5"><img id="st5img" src="images/5.png" title="level 5"></button>
+
                 <div id="clickfinger" class="clickfinger">
                     <img id="clickfinger-img" src="images/finger.png">
                 </div>
@@ -42,7 +49,6 @@
                 <button id="dots"> <img id="dotsimg" src="images/dDots.png" title="show hexagonal grid points"></button>
                 <button id="zoomIn"> <img id="zoomInimg" src="images/zoomIn.png" title="zoom in"></button>
                 <button id="zoomOut"> <img id="zoomOutimg" src="images/zoomOut.png" title="zoom out"></button>
-
                 <button id="save" style="user-select: none" title="Save Puzzle">
                     <i class="fas fa-save"></i>
                 </button>
@@ -460,8 +466,8 @@
                 <div id="level11-text" class="level-text">
                     <p> <b>Lesson 9:</b></p>
                     <p>Buddies are the glue connecting Clusters to form larger super clusters.</p>
-                    <p>Often between Clusters we see lines of Buddies like those in yellow here. These lines can
-                        branch out at 120 degrees angles from each other. </p>
+                    <p>Often between Clusters we see lines of Buddies like those in yellow here. These lines
+                        branch out at 120 degree angles from each other. </p>
                     <P>Where three buddies meet together in a three-armed propeller shape, it's called a <i>triskelion</i>.</p>
                     <p>Use the new Buddies tool to quickly create lines of Buddies joined in a <i>triskelion</i>.</p>
                     <p>Depending on placement, some Buddies that don't connect just right to a line will be colored white
@@ -485,7 +491,7 @@
             <div class="level-text-image">
                 <div id="level12-text" class="level-text">
                     <p> <b>Lesson 10:</b></p>
-                    <p> When three pairs of Buddies can meet, arms locked, in a rotation like this, it is called a <i>triskelion</i>. 
+                    <p> When three pairs of Buddies meet, arms locked, in a rotation like this, it is called a <i>triskelion</i>. 
                         Each of the three Buddies is called a <i>triskelion leg</i>. On large, completed puzzles you will often 
                         see <i>triskelions</i> connecting long chains of Buddies.
                     </p>
@@ -587,7 +593,7 @@
                         This small distinction not only helps with knowing which way to rotate the shapes, but also shows a very interesting
                         property present at any scaling of the <span style="white-space:nowrap">T-Shirts</span> made through this process.
                         You can look all around a large group of <span style="white-space:nowrap">T-Shirts</span> and you will
-                        notice all of the <span style="white-space:nowrap">T-Shirts</span> point toward the center, except one
+                        notice all of the <span style="white-space:nowrap">T-Shirts</span> point inwards, except one
                         <span style="white-space:nowrap">T-Shirt</span>, in one P-shape, on the outside edge will be pointing outward.
                     </p>
                 </div>
@@ -658,7 +664,8 @@
                         and are represented by the <b>triskelion leg</b> shape, and three of
                         which are disjoint, represented by <b>parallelograms</b>. </p>
                     <p> Note one disjoint Buddy pair on the right is colored yellow. It's not yet clearly disjoint 
-                        or part of a <i>triskelion</i> but will be truly disjoint (and white) as we scale up more.</p>
+                        or part of a <i>triskelion</i> but will be truly disjoint (and white) as we scale up more. Also
+                        notice, it is the only one of the six buddy pairs pointing outward.</p>
                 </div>
                 <div id="level17-image" class="level-image">
                     <img width="100%" src="images/triangleSuperScaling.gif" />
@@ -683,10 +690,10 @@
                     <p>The <b>parallelogram</b> scales up to a <b>large parallelogram</b> through these substition
                         rules.</p>
                     <p>Two <b>irregular hexagons</b>, filled with Clusters, are placed side-by-side.</p>
-                    <p>One <b>parallelogram</b> sits between them. The <b>parallogram</b> is filled with a disjoint
-                        Buddies, of course.
-                        This Buddies doesn't know it's disjoint yet, but it will be when we scale up again and then it
-                        will be colored white.</p>
+                    <p>One <b>parallelogram</b> sits between them. The <b>parallogram</b> shape is filled with a disjoint
+                        Buddy pair. This Buddy doesn't know it's disjoint yet, so it's colored yellow, but it will be 
+                        clearly disjoint when we scale up further and it connects to other Buddies. Then it will be colored
+                        white.</p>
                     <p>The Clusters are flanked on the outside by one <b>triskelion leg</b> on each side. These are also
                         filled with Buddies.</p>
                 </div>
@@ -730,13 +737,14 @@
                 <div id="level20-text" class="level-text">
                     <p> <b>Lesson 15:</b></p>
                     <p> That brings us to the last lesson. Now that you know the geometric substitutions, it's really
-                        just a matter of applying them "recursively". This means you start with a shape, like the "H", or <b>irregular hexagon</b>,
-                        and apply the subsitution rules.</p>
-                    <p> This gives you a new shape composed of smaller shapes (H,T,P and F) we'll call the children of the starting shape.
-                        Then you apply the substituion rules to the children giving another generation of shapes
+                        just a matter of applying them "recursively". This means repeatedly applying the substition rules
+                        through successive generations.</p>
+                    </p> For example, start with a shape, like the "H", or <b>irregular hexagon</b>. Then apply the subsitution rules.</p>
+                        This gives you a new shape composed of smaller shapes (H,T,P and F) we'll call the children of the starting shape.
+                        Then apply the substituion rules to the children giving another generation of shapes
                         - the grandchildren. Then apply the rules to the grandchildren and great-grandchildren 
-                        for as many generations as you like, then putting actual <span style="white-space:nowrap">T-Shirts</span>
-                        at the bottom.
+                        for as many generations as desired. At the end, put actual <span style="white-space:nowrap">T-Shirts</span>
+                        inside the last generation of shapes. 
                     </p>
                     <p> On this final lesson, the system will lay out the <span style="white-space:nowrap">T-Shirts</span>
                         for you. You've earned it! The system will create an "H" and recursively generate its descendents
@@ -768,7 +776,7 @@
                     <p><b>+,-</b> Zoom in/out</p>
                     <p><b>x</b> Delete selected <span style="white-space:nowrap">T-Shirts</span></p>
                     <p<b>Shift-Click</b> Add to selection</p>
-                    <p><b>Double Click</b> Select all contiguous (very slow for large patches)</p>
+                    <p><b>Double Click</b> Select all contiguous
                     <p><b>Ctrl/Cmd - C:</b> Copy selected</p>
                     <p><b>Ctrl/Cmd - V:</b> Paste selected</p>
                     <p><b>C</b> Change color palette</p>
@@ -791,14 +799,14 @@
 
     <!-- Add more divs for each level as needed -->
 
-    <script src="boundingbox.js?v=3.3"></script>
-    <script src="tshirt.js?v=3.3"></script>
-    <script src="selection.js?v=3.3"></script>
-    <script src="level.js?v=3.3"></script>
-    <script src="superTile.js?v=3.3"></script>
-    <script src="shape.js?v=3.3"></script>
-    <script src="puzzle.js?v=3.3"></script>
-    <script src="game.js?v=3.3"></script>
+    <script src="boundingbox.js?v=1.3.6"></script>
+    <script src="tshirt.js?v=1.3.6"></script>
+    <script src="selection.js?v=1.3.6"></script>
+    <script src="level.js?v=1.3.6"></script>
+    <script src="superTile.js?v=1.3.6"></script>
+    <script src="shape.js?v=1.3.6"></script>
+    <script src="puzzle.js?v=1.3.6"></script>
+    <script src="game.js?v=1.3.6"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </body>
 

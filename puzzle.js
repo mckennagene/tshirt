@@ -266,11 +266,9 @@ class Puzzle {
         addSideKickBtn.addEventListener('mouseup', this.onAddSideKickMouseUp.bind(this), false);
         addSideKickBtn.addEventListener('mousemove', this.onAddSideKickMouseMove.bind(this), false);
 
-
         //
         // touch devices
         //
-
         this.canvas.addEventListener("touchstart", this.handleTouchStart.bind(this));
         this.canvas.addEventListener("touchmove", this.handleTouchMove.bind(this));
         this.canvas.addEventListener("touchend", this.handleTouchEnd.bind(this));
@@ -304,6 +302,21 @@ class Puzzle {
         dotsBtn.addEventListener('click', this.toggleDots.bind(this));
         zoomInBtn.addEventListener('click', this.zoomIn.bind(this));
         zoomOutBtn.addEventListener('click', this.zoomOut.bind(this));
+
+        // 
+        // Numbers (used for the recursive geometry / SuperTile lesson)
+        //
+        for (let i = 0; i < 6; i++) {
+            let id = 'st'+i;
+            let x = document.getElementById(id);
+            // i'm sure there is a better way to do this
+            if (i == 0) { x.addEventListener('click', this.toggleSTLevel0.bind(this), false); }
+            if (i == 1) { x.addEventListener('click', this.toggleSTLevel1.bind(this), false); }
+            if (i == 2) { x.addEventListener('click', this.toggleSTLevel2.bind(this), false); }
+            if (i == 3) { x.addEventListener('click', this.toggleSTLevel3.bind(this), false); }
+            if (i == 4) { x.addEventListener('click', this.toggleSTLevel4.bind(this), false); }
+            if (i == 5) { x.addEventListener('click', this.toggleSTLevel5.bind(this), false); }
+        }
 
         // 
         // Gear
@@ -813,7 +826,7 @@ class Puzzle {
     }
 
     drawSuperTile(st) {
-        let colors = ["black", "black", "red", "green", "blue", "fuchsia", "purple", "brown", "pink", "yellow"];
+        let colors = ["black", "black", "red", "#44ff88", "blue", "fuchsia", "purple", "brown", "pink", "yellow"];
         if (!this.superTileLevelIsOn[st.level]) { return; }
         //console.log("drawing st " + st.fullId + " " + st.name + " " + st.level);
         let pts = st.getSuperTileShapePoints();
@@ -983,6 +996,27 @@ class Puzzle {
         this.fullRedraw();
     }
 
+    toggleSTLevel0() { this.toggleSTLevel(0); }
+    toggleSTLevel1() { this.toggleSTLevel(1); }
+    toggleSTLevel2() { this.toggleSTLevel(2); }
+    toggleSTLevel3() { this.toggleSTLevel(3); }
+    toggleSTLevel4() { this.toggleSTLevel(4); }
+    toggleSTLevel5() { this.toggleSTLevel(5); }
+    toggleSTLevel( n ) { 
+        if (n == 0) { this.toggleShowingTShirts(); }
+        else { this.toggleSuperTileDrawLevel(n); }
+
+        let img = document.getElementById('st'+n+'img');
+        if( n==0 ) { 
+            if (!this.drawTShirts) { img.src = 'images/' + n + 'grey.png'; }
+            else { img.src = 'images/' + n + '.png'; }
+        }
+        else { 
+            if (!this.superTileLevelIsOn[n]) { img.src = 'images/'+n+'grey.png'; }
+            else { img.src = 'images/' + n + '.png'; }
+        }
+    }
+
     static addToWorkAreas(workAreas, bbox) {
         if (bbox && bbox.hasPoints()) {
             // ensure the workAreas array doesn't already have bbox
@@ -1123,10 +1157,10 @@ class Puzzle {
         Puzzle.addToWorkAreas(workAreas, this.selection.generateBBox());
 
         if (!this.SUPERTILE_DRAW_SUPPRESSION) {
-            if( this.superTileRoot ) { 
+            if (this.superTileRoot) {
                 if (dheading == -60) { this.superTileRoot.rotateCWNTimes(1); }
-                else { this.superTileRoot.rotateCCWNTimes(1); } 
-            } 
+                else { this.superTileRoot.rotateCCWNTimes(1); }
+            }
             this.redoWorkAreas(workAreas);
             this.completedMove();
         }
@@ -1391,8 +1425,8 @@ class Puzzle {
         Puzzle.addToWorkAreas(workAreas, this.selection.clear());
 
         let canvasPt = this.mouseToCanvasCoordinates(this.canvas, event);
-        //const raiseAboveToolPanel = 0;
-        //canvasPt.y -= raiseAboveToolPanel / this.zoomLevel;
+        const raiseAboveToolPanel = 75;
+        canvasPt.y -= raiseAboveToolPanel / this.zoomLevel;
         this.initialCanvasX = canvasPt.x;
         this.initialCanvasY = canvasPt.y;
 
@@ -2093,25 +2127,25 @@ class Puzzle {
                 //    //this.superTileRoot.logTheTree(true);
                 //    break;
                 case "1":
-                    this.toggleSuperTileDrawLevel(1);
+                    this.toggleSTLevel(1);
                     break;
                 case "2":
-                    this.toggleSuperTileDrawLevel(2);
+                    this.toggleSTLevel(2);
                     break;
                 case "3":
-                    this.toggleSuperTileDrawLevel(3);
+                    this.toggleSTLevel(3);
                     break;
                 case "4":
-                    this.toggleSuperTileDrawLevel(4);
+                    this.toggleSTLevel(4);
                     break;
                 case "5":
-                    this.toggleSuperTileDrawLevel(5);
+                    this.toggleSTLevel(5);
                     break;
                 case "6":
-                    this.toggleSuperTileDrawLevel(6);
+                    this.toggleSTLevel(6);
                     break;
                 case "z":
-                    this.toggleShowingTShirts();
+                    this.toggleSTLevel(0);
                     break;
             }
         }
@@ -2140,6 +2174,7 @@ class Puzzle {
             Puzzle.addToWorkAreas(workAreas, this.selection.generateBBox());
         }
         for (let t of this.selection.getSelection()) {
+            this.clearKiteLocations(t);
             t.delete();
             this.tshirts.delete(t);
             this.clearTShirtLocation(t);

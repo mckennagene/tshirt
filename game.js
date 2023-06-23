@@ -387,6 +387,10 @@ class Game {
         this.load.style.display = "none";
         this.gear.style.display = "none";
         this.gearimg.style.display = "none";
+        for( let i = 0 ; i < 6 ; i++ ) { 
+            let stb = document.getElementById('st'+i);
+            stb.display="none";
+        }
     }
 
     showTools(tool) {
@@ -398,6 +402,16 @@ class Game {
         if (tool === "hint") { this.hintButton.style.display = "block"; }
         if (tool === "save") { this.save.style.display = "block"; }
         if (tool === "file") { this.load.style.display = "block"; }
+        if( tool === "stlevels") { 
+            console.log("turning on st tools");
+            for (let i = 0; i < 6; i++) {
+                const id = 'st'+i;
+                let stb = document.getElementById(id);
+                console.log("id=" + id + " stb = " +JSON.stringify(stb));
+                stb.style.display = "block";
+            }
+        }
+        //console.log("done with stlevels");
     }
 
     showAllTools() {

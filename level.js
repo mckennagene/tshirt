@@ -117,7 +117,7 @@ class Level {
             gridSize: { x: 10, y: 8 },
             controls: { tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", badNeighbors: true, surroundColor: true, sideKickColor: false },
             tools: ["addOne", "hint"],
-            //surround: 3,
+            surround: 3,
             //levelGoal: 'Flip one tshirt over to the blue side, then surround it as completely as possible with 3 non-flipped (white) tshirts',
             targets: [
                 { x: 6, y: 3, heading: 0, flip: false, colorName: "red" },
@@ -346,12 +346,12 @@ class Level {
             // 600x600 was big enough for an h6, but h6 is very slow.
             // we will stick with h5 for the final
             gridSize: { x: 260, y: 260 },
-            zoom: 2, // when drawing at very large size you want the zoom level very low initially
+            zoom: 0.2, // when drawing at very large size you want the zoom level very low initially
             controls: {
                 tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true, autoDrawShape: "h", autoDrawLevel: 5
             },
-            tools: ["addOne", "addCluster", "addSideKick"],
+            tools: ["stlevels"],
             showHintsDefault: 2,
             showMetaHints: 1,
             buffer: 0,
@@ -368,6 +368,7 @@ class Level {
             showHintsDefault: 2,
             showMetaHints: 1,
             buffer: 15,
+            complete: "percentTiled",
         }
         ]; // end level data
     }

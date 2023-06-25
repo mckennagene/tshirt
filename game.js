@@ -209,7 +209,6 @@ class Game {
     }
 
     completedMove(numberTs, prcntComplete, trisFilled) {
-        //console.log("in completed move, current level is " + this.currentLevel + " current confetti=" + this.confettiDisplayingCurrently);
         this.gameCompletionCheckCount++;
         const complete = this.levels[this.currentLevel].complete;
         let kitesFilled = trisFilled / 2;
@@ -268,12 +267,12 @@ class Game {
                 if (t.surround) { surroundCount++; }
                 if (t.flip === TShirt.FLIP.TOP) { topCount++; }
                 //console.log("tshirt:" + t.id + " surround=" + t.surround + " sCount=" + surroundCount + 
-                //" tCount=" + topCount );
+                //    " tCount=" + topCount );
             }
             if (topCount >= 1 && surroundCount >= topCount * this.levels[this.currentLevel].surround) {
-                // console.log("right # of surround neighbors");
+                 //console.log("right # of surround neighbors");
                 isComplete = true;
-            }// else { console.log("wrong # surround neighbors: " + surroundCount + " vs " + this.levels[this.currentLevel].surround); }
+            } //else { console.log("wrong # surround neighbors: " + surroundCount + " vs " + this.levels[this.currentLevel].surround); }
         }
         if (isComplete && !this.confettiDisplayingCurrently) {
             this.confettiDisplayingCurrently = true;
@@ -403,11 +402,9 @@ class Game {
         if (tool === "save") { this.save.style.display = "block"; }
         if (tool === "file") { this.load.style.display = "block"; }
         if( tool === "stlevels") { 
-            console.log("turning on st tools");
             for (let i = 0; i < 6; i++) {
                 const id = 'st'+i;
                 let stb = document.getElementById(id);
-                console.log("id=" + id + " stb = " +JSON.stringify(stb));
                 stb.style.display = "block";
             }
         }

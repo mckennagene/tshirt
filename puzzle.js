@@ -831,7 +831,13 @@ class Puzzle {
         //console.log("drawing st " + st.fullId + " " + st.name + " " + st.level);
         let pts = st.getSuperTileShapePoints();
 
-        //console.log( "for shape " + st.fullId + " received " + JSON.stringify( pts ) ) ;
+        let w = 0;
+        // 44646
+        // 45080
+        // 45430
+        // if (st.id == 44646 || st.id == 45080 || st.id == 45430 )  { w = 30; }
+        //if (st.level == 2 && st.name === "p" && st.parent.id== 45080) { console.log( "p inside is " + st.id); }
+        //console.log( "for shape " + st.level + " " + st.name + " " + st.fullId + " received " + JSON.stringify( pts ) ) ;
         if (pts && pts.path) { //&& (st.fullId == "0.115" || st.fullId == "0.25")) {
             this.ctx.save();
 
@@ -841,7 +847,7 @@ class Puzzle {
 
             this.ctx.strokeStyle = colors[st.level];
             this.ctx.fillStyle = "black";
-            this.ctx.lineWidth = 2 + 4 * (st.level - 1);
+            this.ctx.lineWidth = 2 + 4 * (st.level - 1)+w ;
             this.ctx.beginPath();
 
             this.ctx.moveTo(0, 0);
@@ -861,7 +867,7 @@ class Puzzle {
         } else if (pts && pts.specificPoints) {
             this.ctx.strokeStyle = colors[st.level];
             this.ctx.fillStyle = "black";
-            this.ctx.lineWidth = 2 + 4 * (st.level - 1);
+            this.ctx.lineWidth = 2 + 4 * (st.level - 1) +w;
             this.ctx.beginPath();
 
             this.ctx.moveTo(pts.specificPoints[0].x, pts.specificPoints[0].y);
@@ -2338,7 +2344,6 @@ class Puzzle {
         // 3 guides and shadows
         if (!this.showMetaHints && this.showHints > 1) { this.showHints = 0; } // we have no guide
         if (this.showHints > 3) { this.showHints = 0; } // roll over
-        console.log("changed hint to " + this.showHints);
         this.fullRedraw();
     }
 

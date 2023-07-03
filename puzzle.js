@@ -978,7 +978,7 @@ class Puzzle {
 
         // draw a hard rectangular shape where the grid cuts off
         this.ctx.strokeStyle = 'black';
-        this.ctx.setLineDash([0, 0]);
+        this.ctx.setLineDash([]); // for safari must do it this way
         this.ctx.lineWidth = 5 * this.zoomLevel;
         this.ctx.beginPath();
         this.ctx.moveTo(this.leftCanvasBorder, this.topCanvasBorder);

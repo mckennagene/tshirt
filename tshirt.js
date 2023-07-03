@@ -608,7 +608,7 @@ class TShirt {
         // reset the bounding box of this tshirt.
         if (!this.beingDragged || this.puzzle.draggingPostPaste) {
             ctx.beginPath();
-            ctx.setLineDash([0, 0]);
+            ctx.setLineDash([]); // for safari must do it this way
             ctx.strokeStyle = "black";
 
             // get the appropriate color coding
@@ -706,7 +706,7 @@ class TShirt {
         let pt = { x: canvasX, y: canvasY }; // Puzzle.gridToCanvas(hc.col, hc.row);
         ctx.beginPath();
         ctx.strokeStyle = "red";
-        ctx.setLineDash([0, 0]);
+        ctx.setLineDash([]); // for safari must do it this way
         let w = 1 + (this.selected ? 1 : 0);
         ctx.lineWidth = 3;//w;
         ctx.moveTo(pt.x, pt.y);
@@ -827,7 +827,7 @@ class TShirt {
         if (this.beingDragged) { return; }
         const ctx = this.puzzle.ctx;
         ctx.beginPath();
-        ctx.setLineDash([0, 0]);
+        ctx.setLineDash([]); // for safari must do it this way
         // we should palettize this, it's a bit of a hack for now
         let strokeStyle = "grey";
         if (this.flip === TShirt.FLIP.TOP) { strokeStyle = "yellow"; }

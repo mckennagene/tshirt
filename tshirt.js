@@ -524,15 +524,15 @@ class TShirt {
 
     static drawOutlineShadow(canvasX, canvasY, heading, flip, colorName, kiteSize, ctx, shadowNumber) {
         let orientation = flip == TShirt.FLIP.TOP ? 1 : -1;
-        ctx.beginPath();
-        ctx.strokeStyle = colorName;
-        ctx.setLineDash([0, 0]);
+        ctx.setLineDash([]); // for safari must do it this way
         ctx.lineWidth = 3;
+        ctx.strokeStyle = colorName;
+        ctx.beginPath();
         ctx.moveTo(canvasX, canvasY);
         let angle = -1 * Puzzle.degreesToRadians(heading) + Puzzle.WORLD_ROTATION;
         let drawnPoints = [];
         for (let i = 0; i < TShirt.outlineTurns.length; i++) {
-            let da = Puzzle.degreesToRadians(TShirt.outlineTurns[i]);// * orientation ; 
+            let da = Puzzle.degreesToRadians(TShirt.outlineTurns[i]);
             angle += da * orientation;
             let d = TShirt.outlineDist[i] * kiteSize;
             canvasX += d * Math.cos(angle);
@@ -546,6 +546,7 @@ class TShirt {
         // fill the target area with hashes
         ctx.setLineDash([2, 12]); // dashes are 2 long spaced 12 apart
         ctx.lineWidth = 1;
+        ctx.beginPath();
         ctx.moveTo(drawnPoints[12].x, drawnPoints[12].y);
         ctx.lineTo(drawnPoints[7].x, drawnPoints[7].y);
         ctx.stroke();
@@ -563,7 +564,8 @@ class TShirt {
         ctx.moveTo(avg78.x, avg78.y);
         ctx.lineTo(avg1112.x, avg1112.y);
         ctx.stroke();
-
+        ctx.closePath();
+        
         //ctx.fillText(shadowNumber,drawnPoints[12].x,drawnPoints[12].y);
     }
 

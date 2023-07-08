@@ -63,10 +63,14 @@ class Level {
             complete: "shadows",
             buffer: 0
         }, {
-            // good job
+            // new tools
             number: 4,
-            gridSize: { x: 10, y: 16 },
-            controls: { tray: "open", play: "skip", rotate: "on", flip: "on", gear: "on", zoom: "on", badNeighbors: false, surroundColor: false, sideKickColor: false },
+            gridSize: { x: 20, y: 20 },
+            controls: {
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on",
+                badNeighbors: false, surroundColor: false, sideKickColor: false,
+                autoDrawShape: "h", autoDrawLevel: 2
+            },
             tools: ["addOne"],
         },
         {   // bad pairings
@@ -106,7 +110,7 @@ class Level {
             gridSize: { x: 13, y: 10 },
             controls: {
                 tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on",
-                badNeighbors: false, surroundColor: false, sideKickColor: false, showKites: true
+                badNeighbors: false, surroundColor: false, sideKickColor: false, kiteStyle: 1
             },
             tools: ["addOne"],
             complete: "percentTiled",
@@ -215,22 +219,32 @@ class Level {
             complete: "shadows",
             buffer: 1
         }, {
-            // 2nd challenge level 
+            // new styles
             number: 13,
+            gridSize: { x: 40, y: 40 },
+            controls: {
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", grid: "on", color: "on",
+                badNeighbors: true, surroundColor: true, sideKickColor: true,
+                autoDrawShape: "h", autoDrawLevel: 3, kiteStyle: 2, palette: 2
+            },
+            tools: ["addOne", "addCluster", "addSideKick"],
+        }, {
+            // 2nd challenge level 
+            number: 14,
             gridSize: { x: 20, y: 16 },
             controls: {
-                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
-                badNeighbors: true, surroundColor: true, sideKickColor: true, showKites: true
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
+                badNeighbors: true, surroundColor: true, sideKickColor: true, kiteStyle: 1
             },
             tools: ["addOne", "addCluster", "addSideKick"],
             complete: "percentTiled",
             buffer: 6
         },
         {   // Symbolic Language
-            number: 14,
+            number: 15,
             gridSize: { x: 15, y: 10 },
             controls: {
-                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
             },
             tools: ["addOne", "addCluster", "addSideKick", "hint"],
@@ -248,10 +262,10 @@ class Level {
             buffer: 1
         },
         {   // Those Little Arrows
-            number: 15,
+            number: 16,
             gridSize: { x: 15, y: 10 },
             controls: {
-                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true, play: "skip",
             },
             tools: ["addOne", "addCluster", "addSideKick", "hint"],
@@ -266,10 +280,10 @@ class Level {
             buffer: 1
         },
         {   // Small Triangle to Large Triangle Scaling
-            number: 16,
+            number: 17,
             gridSize: { x: 15, y: 10 },
             controls: {
-                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
             },
             tools: ["addOne", "addCluster", "addSideKick", "hint"],
@@ -285,10 +299,10 @@ class Level {
             buffer: 1
         },
         {   // Large Triangle => Super Triangle Scaling
-            number: 17,
+            number: 18,
             gridSize: { x: 20, y: 16 },
             controls: {
-                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
             },
             tools: ["addOne", "addCluster", "addSideKick", "hint"],
@@ -302,10 +316,10 @@ class Level {
             buffer: 2
         },
         {   // Parallelogram Scaling
-            number: 18,
+            number: 19,
             gridSize: { x: 20, y: 16 },
             controls: {
-                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
             },
             tools: ["addOne", "addCluster", "addSideKick", "hint"],
@@ -322,10 +336,10 @@ class Level {
             buffer: 2
         },
         {   // Fylfot Scaling
-            number: 19,
+            number: 20,
             gridSize: { x: 20, y: 16 },
             controls: {
-                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true
             },
             tools: ["addOne", "addCluster", "addSideKick", "hint"],
@@ -340,28 +354,45 @@ class Level {
             complete: "shadows",
             buffer: 2
         },
-        {   // Recursive Geometry
-            number: 20,
+        {   // Recursive Geometry h4
+            number: 21,
             // 260x260 is big enough for an h5, it will look like extra room, but probaboly the optionals use it
             // 600x600 was big enough for an h6, but h6 is very slow.
             // we will stick with h5 for the final
-            gridSize: { x: 260, y: 260 },
+            gridSize: { x: 80, y: 80 },
+            zoom: 0.5, // when drawing at very large size you want the zoom level very low initially
+            controls: {
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
+                badNeighbors: true, surroundColor: true, sideKickColor: true, autoDrawShape: "h", autoDrawLevel: 4
+            },
+            tools: ["stlevels4"],
+            showHintsDefault: 2,
+            showMetaHints: 1,
+            buffer: 0,
+        },
+        {
+            // Recursive Geometry p5
+            number: 22,
+            // 260x260 is big enough for an h5, it will look like extra room, but probaboly the optionals use it
+            // 600x600 was big enough for an h6, but h6 is very slow.
+            // we will stick with h5 for the final
+            gridSize: { x: 200, y: 180 },
             zoom: 0.2, // when drawing at very large size you want the zoom level very low initially
             controls: {
-                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
-                badNeighbors: true, surroundColor: true, sideKickColor: true, autoDrawShape: "h", autoDrawLevel: 5
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
+                badNeighbors: true, surroundColor: true, sideKickColor: true, autoDrawShape: "p", autoDrawLevel: 5
             },
-            tools: ["stlevels"],
+            tools: ["stlevels5"],
             showHintsDefault: 2,
             showMetaHints: 1,
             buffer: 0,
         },
         {   // Play
-            number: 21,
+            number: 23,
             gridSize: { x: 100, y: 100 },
             zoom: 0.5,
             controls: {
-                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on",
+                tray: "open", rotate: "on", flip: "on", gear: "on", zoom: "on", saveLoad: "on", grid: "on", color: "on",
                 badNeighbors: true, surroundColor: true, sideKickColor: true,
             },
             tools: ["addOne", "addCluster", "addSideKick"],

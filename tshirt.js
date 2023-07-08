@@ -174,15 +174,15 @@ class TShirt {
         this.points = null;//[];
         this.triangles = null;//[];
         this.kiteMidpoints = null;//[];
-        this.superTile =null;
+        this.superTile = null;
         // compute the points
         //this.computeOutlineDefault();
         //this.computePoints(this.kitesForThisPosition());
 
-        
+
     }
 
-    setSuperTile(st ) { this.superTile = st; }
+    setSuperTile(st) { this.superTile = st; }
     updateLocationOnPaste(gridPT) {
         this.gridX = gridPT.x;
         this.gridY = gridPT.y;
@@ -458,8 +458,8 @@ class TShirt {
                 for (let j = 0; j < this.kitesOccupied.length; j += 2) {
                     for (let l of this.kitesOccupied[j + 1]) {
                         let t = this.kitesOccupied[j].x + "," + this.kitesOccupied[j].y + ":" + l;
-                        if (s === t) { console.log("\t" + s + " === " + t); return true;  }
-                        else { console.log( "\t" + s + " !== " + t + " keep looking") ; }
+                        if (s === t) { console.log("\t" + s + " === " + t); return true; }
+                        else { console.log("\t" + s + " !== " + t + " keep looking"); }
                     }
                 }
             }
@@ -507,7 +507,7 @@ class TShirt {
         const hex1Kites = this.puzzle.rotateKites(heading, flip, [1, 2, 3, 4]);
         const hex2 = this.puzzle.findNeighboringHexagon(gridX, gridY, 0 + heading);
         let hex2Kites = this.puzzle.rotateKites(heading, flip, [0, 1]);
-        if (flip == TShirt.FLIP.BOTTOM) {  hex2Kites = this.puzzle.rotateKites(heading, flip, [4, 5])  };
+        if (flip == TShirt.FLIP.BOTTOM) { hex2Kites = this.puzzle.rotateKites(heading, flip, [4, 5]) };
         let hex3 = this.puzzle.findNeighboringHexagon(gridX, gridY, -60 + heading);
         let hex3Kites = this.puzzle.rotateKites(heading, flip, [4, 5]);
         if (flip == TShirt.FLIP.BOTTOM) {
@@ -565,7 +565,7 @@ class TShirt {
         ctx.lineTo(avg1112.x, avg1112.y);
         ctx.stroke();
         ctx.closePath();
-        
+
         //ctx.fillText(shadowNumber,drawnPoints[12].x,drawnPoints[12].y);
     }
 
@@ -600,16 +600,17 @@ class TShirt {
      * @param fillColor is used when the T-Shirt is doing it's "rattle" animation because another T-Shirt tried to land on top of this one.
      */
     drawOutline(showSurround, showSideKick, fillColor) {
-        if(this.phantom && !this.puzzle.SHOW_PHANTOMS) { return;}
-        if(this.phantom && this.puzzle.getTShirtAtLocation(this.gridX,this.gridY)) { 
+        if (this.phantom && !this.puzzle.SHOW_PHANTOMS) { return; }
+        if (this.phantom && this.puzzle.getTShirtAtLocation(this.gridX, this.gridY)) {
             return; // don't draw a phantom if there is a real tshirt here
-        } 
+        }
         let ctx = this.puzzle.ctx;
         // reset the bounding box of this tshirt.
         if (!this.beingDragged || this.puzzle.draggingPostPaste) {
             ctx.beginPath();
             ctx.setLineDash([]); // for safari must do it this way
-            ctx.strokeStyle = "black";
+            ctx.strokeStyle = this.puzzle.tshirtColors.outline;
+            if( this.selected) { ctx.strokeStyle = "black"; }
 
             // get the appropriate color coding
             if (!this.color) {
@@ -636,7 +637,7 @@ class TShirt {
             ctx.fillStyle = this.color;
             let w = 2 + (this.selected ? 3 : 0);
             ctx.lineWidth = w;
-            if (this.phantom) { ctx.fillStyle = "lavender";  } // was only used for debugging, generall we don't draw phantoms anyway.
+            if (this.phantom) { ctx.fillStyle = "lavender"; } // was only used for debugging, generall we don't draw phantoms anyway.
             // this is used when we rattle, 
             if (fillColor) { ctx.fillStyle = fillColor; }
 
@@ -646,8 +647,38 @@ class TShirt {
             }
             ctx.closePath();
             ctx.fill();
-
             ctx.stroke();
+
+            if( this.puzzle.TMO && this.flip === TShirt.FLIP.TOP ) { 
+                let mid1 = { x: (this.points[12].x + this.points[0].x )/2, 
+                            y: ( (this.points[12].y  + this.points[0].y)  ) / 2 };
+                let mid2 = {
+                    x: (this.points[9].x + this.points[8].x) / 2,
+                    y: (( this.points[9].y + this.points[8].y  ) / 2 )
+                }
+                let mid = { x: (mid1.x + mid2.x ) /2 , y: (mid1.y + mid2.y) /2 } ;
+                let rot = -1*Puzzle.degreesToRadians( this.heading-300);
+                ctx.fillStyle = "white";
+                const fontSize = 48;
+                const fontFamily = "Times";
+                ctx.save();
+                ctx.font = fontSize + 'px ' + fontFamily;
+                const textWidth = ctx.measureText("T").width;
+                let xadj = (textWidth / 2) * Math.cos(rot) + (fontSize / 5) * Math.sin(rot);
+                let yadj = -(textWidth / 2) * Math.sin(rot) + (fontSize / 5) * Math.cos(rot );
+                ctx.translate(mid.x-xadj,mid.y+yadj);
+                ctx.rotate(rot);
+                ctx.fillText("T", 0,0);
+                xadj = -0.5;
+                yadj = -20; 
+                ctx.fillRect(-xadj,yadj,7,7);
+                xadj = -21.5;
+                yadj = -20;
+                ctx.fillRect(-xadj, yadj, 7, 7);
+
+                ctx.restore();
+            }
+            
         } //else { console.log("not drawing outline - dragged="+ this.beingDragged + " draggedpostpaste=" + this.puzzle.draggingPostPaste);}
 
         // for debugging, this code plots the number of each side of the tshirt.
@@ -823,39 +854,138 @@ class TShirt {
     }
 
     drawKites() {
-        if (this.puzzle.SHOW_KITES != 1) { return; }
+
+        if (this.puzzle.SHOW_KITES === 0) { return; }
         if (this.beingDragged) { return; }
+
         const ctx = this.puzzle.ctx;
+
+        if (this.puzzle.SHOW_KITES == 1) {
+            ctx.setLineDash([]); // for safari must do it this way
+            // we should palettize this, it's a bit of a hack for now
+            let strokeStyle = "grey";
+            if (this.flip === TShirt.FLIP.TOP) { strokeStyle = "yellow"; }
+            else if (this.color === "grey") { strokeStyle = "white"; }
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = 1;
+            // a failed artistic experiment, coloring kites 
+            //let colors = ["#0f470f", "#2f672f", "#4f874f","#6fa76f","#0000ff", "#4010ff", "#8020ff", "#a030ff"]
+            //let colors = ["#0f470f", "#2f672f", "#4f874f", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"];
+            for (let t = 0; t < this.triangles.length - 1; t += 2) {
+                // a kite is composed of the first two points of one triangle and the second point of the next triangle.
+                const tri1 = this.triangles[t];
+                const tri2 = this.triangles[t + 1];
+                ctx.beginPath();
+                ctx.moveTo(tri1[0].x, tri1[0].y);
+                ctx.lineTo(tri1[1].x, tri1[1].y);
+                ctx.lineTo(tri1[2].x, tri1[2].y);
+                ctx.lineTo(tri2[2].x, tri2[2].y);
+                ctx.lineTo(tri1[0].x, tri1[0].y);
+                ctx.closePath();
+                // artistic experiment, coloring kites
+                // ctx.fillStyle = colors[(Math.floor(t/2))]; 
+                // ctx.fill() ; 
+                ctx.stroke();
+            }
+            return ;
+        }
+        
+        // if show_kites == 2
+        let curveColor = this.puzzle.tshirtColors.styling;
+        // arc1 : draw an arc from the midpoint of pt0 and pt1 to the midpoint of pt0 and pt4
+        var midpoint = {
+            x: (this.points[0].x + this.points[4].x) / 2,
+            y: (this.points[0].y + this.points[4].y) / 2
+        };
+        var radius = Math.sqrt(Math.pow(midpoint.x - this.points[0].x, 2) + Math.pow(midpoint.y - this.points[0].y, 2));
+        var startAngle = -2 * Math.PI / 3 - Puzzle.degreesToRadians(this.heading) + Puzzle.degreesToRadians(30);
+        var endAngle = -2 * Math.PI / 3 - Puzzle.degreesToRadians(this.heading) + Puzzle.degreesToRadians(150);
+        if (this.flip == TShirt.FLIP.TOP) {
+            startAngle = 2 * Math.PI / 3 - Puzzle.degreesToRadians(this.heading) + Puzzle.degreesToRadians(30);
+            endAngle = 2 * Math.PI / 3 - Puzzle.degreesToRadians(this.heading) + Puzzle.degreesToRadians(150);
+        }
         ctx.beginPath();
-        ctx.setLineDash([]); // for safari must do it this way
-        // we should palettize this, it's a bit of a hack for now
-        let strokeStyle = "grey";
-        if (this.flip === TShirt.FLIP.TOP) { strokeStyle = "yellow"; }
-        else if (this.color === "grey") { strokeStyle = "white"; }
-        ctx.strokeStyle = strokeStyle;
-        ctx.lineWidth = 1;
-        for (let t = 0; t < this.triangles.length - 1; t += 2) {
-            // a kite is composed of the first two points of one triangle and the second point of the next triangle.
-            const tri1 = this.triangles[t];
-            const tri2 = this.triangles[t + 1];
-            ctx.moveTo(tri1[0].x, tri1[0].y);
-            ctx.lineTo(tri1[1].x, tri1[1].y);
-            ctx.lineTo(tri1[2].x, tri1[2].y);
-            ctx.lineTo(tri2[2].x, tri2[2].y);
-            ctx.lineTo(tri1[0].x, tri1[0].y);
-            ctx.closePath();
-            ctx.stroke();
+        ctx.arc(this.points[0].x, this.points[0].y, radius, startAngle, endAngle);
+        ctx.strokeStyle = curveColor;
+        ctx.stroke();
+
+        // arc 2
+        endAngle = (7 * Math.PI / 6) - Puzzle.degreesToRadians(this.heading);
+        startAngle = endAngle - 2 * Math.PI / 3;
+        if (this.flip == TShirt.FLIP.TOP) {
+            endAngle = -(9 * Math.PI / 6) - Puzzle.degreesToRadians(this.heading);
+            startAngle = endAngle - 2 * Math.PI / 3;
+        }
+        ctx.beginPath();
+        ctx.arc(this.points[5].x, this.points[5].y, radius, startAngle, endAngle);
+        ctx.strokeStyle = curveColor;
+        ctx.stroke();
+
+        // arc 3
+        radius = Math.sqrt(Math.pow(midpoint.x - this.points[5].x, 2) + Math.pow(midpoint.y - this.points[5].y, 2));
+        startAngle = Math.PI / 2 - Puzzle.degreesToRadians(this.heading);
+        endAngle = 5 * Math.PI / 6 - Puzzle.degreesToRadians(this.heading);
+        if (this.flip == TShirt.FLIP.TOP) {
+            let tmp = startAngle;
+            startAngle = - Puzzle.degreesToRadians(this.heading) + Math.PI / 6;
+            endAngle = tmp;
+        }
+        ctx.beginPath();
+        ctx.arc(this.points[5].x, this.points[5].y, radius, startAngle, endAngle);
+        ctx.strokeStyle = curveColor;
+        ctx.stroke();
+
+        // arc 4
+        // find the intersection of these two points
+        var tolerance = 0.01; // Adjust the tolerance value as needed
+
+        var slope1 = Math.abs(this.points[12].x - this.points[0].x) <= tolerance ? Infinity : (this.points[12].y - this.points[0].y) / (this.points[12].x - this.points[0].x);
+        var slope2 = Math.abs(this.points[10].x - this.points[9].x) <= tolerance ? Infinity : (this.points[10].y - this.points[9].y) / (this.points[10].x - this.points[9].x);
+
+        var intersectionX, intersectionY;
+        if (slope1 === Infinity) {
+            intersectionX = this.points[0].x;
+            intersectionY = slope2 * (intersectionX - this.points[9].x) + this.points[9].y;
+        } else if (slope2 === Infinity) {
+            intersectionX = this.points[9].x;
+            intersectionY = slope1 * (intersectionX - this.points[0].x) + this.points[0].y;
+        } else {
+            intersectionX = (this.points[9].y - this.points[0].y + slope1 * this.points[0].x - slope2 * this.points[9].x) / (slope1 - slope2);
+            intersectionY = slope1 * (intersectionX - this.points[0].x) + this.points[0].y;
         }
 
-        // label kite midpoints
-        ctx.fillStyle="black";
-        for (let i = 0 ; i < 6 ; i+=2 ) { 
-            let gridPt   = this.kitesOccupied[i];
-            let kites    = this.kitesOccupied[i+1];
-            let canvasPt = Puzzle.gridToCanvas(gridPt.x,gridPt.y,Puzzle.KITE_SIZE);
-            
-        //    ctx.fillText( i, this.kiteMidpoints[i].x, this.kiteMidpoints[i].y);
+        var intersectionPoint = {
+            x: intersectionX,
+            y: intersectionY
+        };
+
+
+        midpoint = {
+            x: (this.points[0].x + this.points[12].x) / 2,
+            y: (this.points[0].y + this.points[12].y) / 2
+        };
+        radius = Math.sqrt(Math.pow(midpoint.x - intersectionPoint.x, 2) + Math.pow(midpoint.y - intersectionPoint.y, 2));
+        startAngle = 3 * Math.PI / 2 - Puzzle.degreesToRadians(this.heading);
+        endAngle = 3 * Math.PI / 2 - Puzzle.degreesToRadians(this.heading) + Puzzle.degreesToRadians(60);
+        if (this.flip == TShirt.FLIP.TOP) {
+            let tmp = startAngle;
+            startAngle = - Puzzle.degreesToRadians(this.heading) + 7 * Math.PI / 6;
+            endAngle = tmp;
         }
+        ctx.beginPath();
+        ctx.arc(intersectionPoint.x, intersectionPoint.y, radius, startAngle, endAngle);
+        ctx.strokeStyle = curveColor;
+        ctx.stroke();
+
+        // label kite midpoints
+        //ctx.fillStyle="black";
+        //for (let i = 0 ; i < 6 ; i+=2 ) { 
+        //    let gridPt   = this.kitesOccupied[i];
+        //    let kites    = this.kitesOccupied[i+1];
+        //    let canvasPt = Puzzle.gridToCanvas(gridPt.x,gridPt.y,Puzzle.KITE_SIZE);
+
+        //    ctx.fillText( i, this.kiteMidpoints[i].x, this.kiteMidpoints[i].y);
+        // }
 
         /*// draw midpoints and kite Numbers
         ctx.fillStyle = "red";
@@ -982,7 +1112,7 @@ class TShirt {
     }
 
     // optimization for rendering supertiles
-    gridMoveLight( dx,dy) {
+    gridMoveLight(dx, dy) {
         this.gridX += dx;
         this.gridY += dy;
     }
@@ -994,12 +1124,12 @@ class TShirt {
      */
     gridMove(dx, dy) {
         this.surround = false;
-        
+
         // get the kites cover in this change
         this.puzzle.clearLocation(this.gridX, this.gridY, this); // clear the old location including the old kites occupied
-        this.puzzle.clearKiteLocations( this ); // clear the old kites occupied
-        this.kitesOccupied = this.kitesForPosition(this.gridX + dx, this.gridY + dy, this.heading, this.flip); 
-        
+        this.puzzle.clearKiteLocations(this); // clear the old kites occupied
+        this.kitesOccupied = this.kitesForPosition(this.gridX + dx, this.gridY + dy, this.heading, this.flip);
+
         this.gridX += dx;
         this.gridY += dy;
         const pt = Puzzle.gridToCanvas(this.gridX, this.gridY, Puzzle.KITE_SIZE);

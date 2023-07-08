@@ -31,7 +31,7 @@ class Game {
 
     addNavivationOption(menu, lessonNumber, symbol) {
         const linkElement = document.createElement("a");
-        linkElement.href = "index.html?level=" + lessonNumber;
+        linkElement.href = "puzzle.html?level=" + lessonNumber;
         const linkTextNode = document.createTextNode(symbol);
         linkElement.appendChild(linkTextNode);
         const spaceNode = document.createTextNode(" ");
@@ -58,8 +58,6 @@ class Game {
         let id = "level" + this.currentLevel;
         const levelDiv = document.getElementById(id);
         const parentTabNumber = levelDiv.getAttribute("data-group");
-        //if (levelDiv) { console.log("got level div id= " + id); }
-        //else { console.log("failed to find " + id); }
         levelDiv.style.display = "block";
 
         // remove any previous tabs and select elements added by this function
@@ -77,7 +75,7 @@ class Game {
         // Create a new parent select menu to group the level selection so it isn't 1 giant list.
 
         const tabNames = ['Beginner: Tools', 'Intermediate: Shapes', 'Advanced: Strategy'];
-        const tabLinks = ['index.html?level=0', 'index.html?level=8', 'index.html?level=14'];
+        const tabLinks = ['puzzle.html?level=0', 'puzzle.html?level=8', 'puzzle.html?level=15'];
 
         const tabContainer = document.createElement('div');
         tabContainer.className = 'level-tabs';
@@ -125,7 +123,7 @@ class Game {
         levelDiv.insertAdjacentElement("afterbegin", tabContainer);
         selectChild.addEventListener("change", function () {
             const selectedOptionValue = this.value;
-            const newUrl = `index.html?level=${selectedOptionValue}`;
+            const newUrl = `puzzle.html?level=${selectedOptionValue}`;
             window.location.href = newUrl;
         });
     }
@@ -159,19 +157,31 @@ class Game {
             for (let s of this.targets) { this.shadows = this.shadows.concat(s.getAllShadows()); }
             this.targetShadowCount = this.shadows.length;
         }
+
+        // we might have auto-drawn some tiles but that doesn't mean we want to show the super tile shapes
+        let showSuperTiles = false ;
+        for (let t of this.levels[this.currentLevel].tools) {
+            if (t.startsWith("stlevels") ) { showSuperTiles = true; } 
+        }
+
+        let pal = 0; 
+        if (this.levels[this.currentLevel].controls.palette) { pal = this.levels[this.currentLevel].controls.palette ; }
+        let ks = 0 ; 
+        if (this.levels[this.currentLevel].controls.kiteStyle) { ks = this.levels[this.currentLevel].controls.kiteStyle; }
         
         this.puzzle.resetPuzzle(
             this.levels[this.currentLevel].gridSize,
             this.levels[this.currentLevel].buffer == null ? 2 : this.levels[this.currentLevel].buffer,
             zoom,
-            Puzzle.palette[0],
+            Puzzle.palette[pal],
             this.targets,
             this.levels[this.currentLevel].controls.badNeighbors,
             this.levels[this.currentLevel].controls.surroundColor,
             this.levels[this.currentLevel].controls.sideKickColor,
-            this.levels[this.currentLevel].controls.showKites,
+            ks,
             this.levels[this.currentLevel].controls.autoDrawShape,
             this.levels[this.currentLevel].controls.autoDrawLevel,
+            showSuperTiles,
             this.levels[this.currentLevel].showHintsDefault,
             this.levels[this.currentLevel].showMetaHints
         );
@@ -194,6 +204,8 @@ class Game {
             else { this.hideFlip(); }
             if (this.levels[this.currentLevel].controls.grid === "on") { this.showGrid(); }
             else { this.hideGrid(); }
+            if (this.levels[this.currentLevel].controls.color === "on") { this.showColor(); }
+            else { this.hideColor(); }
             if (this.levels[this.currentLevel].controls.zoom === "on") { this.showZoom(); }
             else { this.hideZoom(); }
             if (this.levels[this.currentLevel].controls.dots === "on") { this.showDots(); }
@@ -325,6 +337,8 @@ class Game {
         this.flipimg = document.getElementById('flipimg');
         this.grid = document.getElementById('grid');
         this.gridimg = document.getElementById('gridimg');
+        this.color = document.getElementById('color');
+        this.colorimg = document.getElementById('colorimg');
         this.dots = document.getElementById('dots');
         this.dotsimg = document.getElementById('dotsimg');
         this.gear = document.getElementById('gearContainer');
@@ -401,8 +415,10 @@ class Game {
         if (tool === "hint") { this.hintButton.style.display = "block"; }
         if (tool === "save") { this.save.style.display = "block"; }
         if (tool === "file") { this.load.style.display = "block"; }
-        if( tool === "stlevels") { 
-            for (let i = 0; i < 6; i++) {
+        if( tool === "stlevels4" || tool==="stlevels5") { 
+            let max = 6;
+            if( tool === "stlevels4" ){ max=5;}
+            for (let i = 0; i < max; i++) {
                 const id = 'st'+i;
                 let stb = document.getElementById(id);
                 stb.style.display = "block";
@@ -444,6 +460,7 @@ class Game {
                 if (this.levels[this.currentLevel].controls.rotate === "on") { this.showRotate(); }
                 if (this.levels[this.currentLevel].controls.flip === "on") { this.showFlip(); }
                 if (this.levels[this.currentLevel].controls.grid === "on") { this.showGrid(); }
+                if (this.levels[this.currentLevel].controls.color === "on") { this.showColor(); }
                 if (this.levels[this.currentLevel].controls.dots === "on") { this.showDots(); }
                 if (this.levels[this.currentLevel].controls.gear === "on") { this.showGear(); }
                 if (this.levels[this.currentLevel].controls.zoom === "on") { this.showZoom(); }
@@ -462,6 +479,7 @@ class Game {
             this.hideRotate();
             this.hideFlip();
             this.hideGrid();
+            this.hideColor();
             this.hideDots();
             this.hideGear();
             this.hideZoom();
@@ -511,9 +529,19 @@ class Game {
         this.grid.style.display = 'flex';
         this.gridimg.style.display = 'flex';
     }
+    showColor() { // show the color button in the lower tray
+        const lt = document.getElementById('lowerTray');
+        lt.style.display = 'flex';
+        this.color.style.display = 'flex';
+        this.colorimg.style.display = 'flex';
+    }
     hideGrid() { // hide the grid button in the lower tray
         this.grid.style.display = 'none';
         this.gridimg.style.display = 'none';
+    }
+    hideColor() { // hide the color button in the lower tray
+        this.color.style.display = 'none';
+        this.colorimg.style.display = 'none';
     }
     showDots() { // show the dots button in the lower tray
         const lt = document.getElementById('lowerTray');

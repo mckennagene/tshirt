@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-Shirt Puzzle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="puzzle.css?v=2" />
+</head>
+
+<body>
+    <div id="canvas-container" style="display: flex;">
+        <canvas id="puzzle" width="100%" height="100%" tabindex="0"></canvas>
+    </div>
+    <div class="scoreBoard" id="scoreBoard">
+        <span id="score"></span>
+    </div>
+    <div id="tray">
+        <div id="trayContent">
+            <div id="trayButtons">
+                <button id="addOne"><img src="images/B.png" title="Add T-Shirt"></button>
+                <button id="addCluster"><img src="images/H.png" title="Add Cluster"></button>
+                <button id="addSideKick"><img src="images/SK.png" title="Add Buddy Pair"></button>
+
+                <button id="st0"><img id="st0img" src="images/B.png" title="tshirts"></button>
+                <button id="st1"><img id="st1img" src="images/1.png" title="level 1"></button>
+                <button id="st2"><img id="st2img" src="images/2.png" title="level 2"></button>
+                <button id="st3"><img id="st3img" src="images/3.png" title="level 3"></button>
+                <button id="st4"><img id="st4img" src="images/4.png" title="level 4"></button>
+                <button id="st5"><img id="st5img" src="images/5.png" title="level 5"></button>
+
+                <div id="clickfinger" class="clickfinger">
+                    <img id="clickfinger-img" src="images/finger.png">
+                </div>
+                <button id="help"><img src="images/help.png" title="Help"></button>
+                <button id="hint"><img src="images/hintInv.png" title="Give a Hint"></button>
+            </div>
+            <div id="lowerTray">
+                <div id="gearContainer" style="display:none">
+                    <img id="gear" src="images/gearINV.png" title="settings" style="display:none" />
+                </div>
+                <button id="rotateCCW"><img id="rotateCCWimg" src="images/rotateCCW.png"
+                        title="rotate counter-clockwise"></button>
+                <button id="rotateCW"><img id="rotateCWimg" src="images/rotateCW.png" title="rotate clockwise"></button>
+                <button id="flip"> <img id="flipimg" src="images/flip2.png" title="flip"></button>
+                <span>&nbsp;</span>
+                <button id="grid"> <img id="gridimg" src="images/gGrid.png" title="cycle tshirt style"></button>
+                <button id="color"> <img id="colorimg" src="images/cColor.png" title="cycle color palette"></button>
+                <button id="dots"> <img id="dotsimg" src="images/dDots.png" title="show hexagonal grid points"></button>
+                <button id="zoomIn"> <img id="zoomInimg" src="images/zoomIn.png" title="zoom in"></button>
+                <button id="zoomOut"> <img id="zoomOutimg" src="images/zoomOut.png" title="zoom out"></button>
+                <button id="save" style="user-select: none" title="Save Puzzle">
+                    <i class="fas fa-save"></i>
+                </button>
+
+                <input type="file" id="load" name="files" accept="application/json" style="display:none;" />
+
+                <label for="load" id="loadLabel" title="Upload a Saved Puzzle" style="user-select: none">
+                    <i class="fas fa-upload"></i>
+                </label>
+
+
+                <!--button id="save"><i class="fas fa-save"></i></button>
+                <label for="load" id="loadLabel">
+                    <i class="fas fa-upload"></i>
+                    <input type="file" id="load" name="files" accept="application/json">
+                </label>-->
+                <div id="trayText"> </div>
+            </div>
+        </div>
+    </div>
+    <div id="toolTray">
+        <div id="trayToggle">+</div>
+    </div>
+    <div class="settings" id="settings-dialog">
+        <div class"table">
+            <div class="table-row">
+                <div class="table-cell-bold">Display Settings:</div>
+            </div>
+            <div class="table-row">
+                <div class="table-cell settings-cell"><input id="grid-checkbox" type="checkbox"></div>
+                <div class="table-cell">Show grid lines (kites) within <span style="white-space:nowrap">T-Shirts</span>
+                    ('G')</div>
+            </div>
+            <div class="table-row">
+                <div class="table-cell settings-cell"><input id="dots-checkbox" type="checkbox"></div>
+                <div class="table-cell">Show hexagonal grid dots ('D')</div>
+            </div>
+            <div class="table-row">
+                <div class="table-cell-bold">Saving Puzzles:</div>
+            </div>
+            <div class="table-row">
+                <div class="table-cell settings-cell">
+                    <button id="settings-save" style="user-select: none" title="Save">
+                        <i class="fas fa-save"></i>
+                    </button>
+                </div>
+                <div class="table-cell">Save current puzzle<br />&nbsp;<br /> <!-- hack to add vertical space -->
+                </div>
+            </div>
+            <div class="table-row"></div>
+            <div class="table-cell settings-cell">
+                <input type="file" id="settings-load" name="files" accept="application/json" style="display:none;" />
+                <label for="load" id="loadLabel2" title="Upload a Saved Puzzle" style="user-select: none">
+                    <i class="fas fa-upload"></i>
+                </label>
+                <br />&nbsp;<br /> <!-- hack to add vertical space -->
+            </div>
+            <div class="table-cell">Upload a saved puzzle</div>
+        </div>
+        <div class="table-row">
+            <div class="table-cell-bold">Click/Touch Options:</div>
+        </div>
+        <div class="table-row">
+            <ul class="nobull">
+                <li><b>Click</b>: Select or unselect</li>
+                <li><b>Double Click</b>: Select all continguous</li>
+                <li><b>Shift-Click</b> Add to, or remove from, selection</li>
+            </ul>
+        </div>
+        <div class="table-row">
+            <div class="table-cell-bold">Desktop Key Commands:</div>
+        </div>
+        <div class="table-row">
+            <ul class="nobull">
+                <li><b>G</b>&nbsp;&nbsp;toggle grid lines (kites) on/off</li>
+                <li><b>D</b>&nbsp;&nbsp;toggle hexagonal grid dots on/off</li>
+                <li><b>Arrows</b>: move selection up,down,left,right</li>
+                <li><b>-</b>&nbsp;&nbsp;zoom out</li>
+                <li><b>+</b>&nbsp;&nbsp;zoom in</li>
+                <li><b>x</b>&nbsp;&nbsp;delete selected T-Shirts</li>
+            </ul>
+        </div>
+        <div class="table-done-row">
+            <div class="table-cell settings-cell"></div>
+            <div class="table-cell"><button id="settingsDoneButton" class="ok-button">Ok</button></div>
+        </div>
+    </div>
+    </div>
+
+    <div id="level0" data-group=0 class="level-dialog level0" data-title="T-Shirt">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level0-text" class="level-text">
+                    <p> <b>Lesson 1:</b></p>
+                    <p><span style="white-space:nowrap">T-Shirt</span> is a shape that "exhibits aperiodic tiling".
+                        That's a
+                        fancy way of saying you can lay them down next to each other, with no gaps between, forever, and
+                        never see a repeating pattern. <a href="learningMore.html">Learn more</a> about tiling and its
+                        history here.
+                    </p>
+                    <p> And <span style="white-space:nowrap">T-Shirt</span> is a jigsaw puzzle, with no picture to guide
+                        you. On the other hand, every piece is exactly the
+                        same shape. So maybe it's an easy puzzle?
+                    </p>
+                    <p> Actually, completing a 200 piece <span style="white-space:nowrap">T-Shirt</span> puzzle without
+                        any training is very hard. If you want to try first without any help, click <a
+                            href="puzzle.html?level=14&ins=skip">here</a>.
+                    </p>
+                    <p> Or continue through some learning challenges and you'll be a pro in no time.
+                    </p>
+                </div>
+                <div id="level0-image" class="level-image">
+                    <img width="100%" src="images/Tblue.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump0"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level0-ok" class="ok-button" data-gamelevel="level0">OK</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="level1" data-group=0 class="level-dialog level1" data-title="Basic Click and Drag">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level1-text" class="level-text">
+                    <p> <b>Lesson 2:</b></p>
+                    <p>This lesson is easy. Drag four <span style="white-space:nowrap">T-Shirts</span> into the puzzle
+                        space</p>
+                    <p>Click and drag the small <span style="white-space:nowrap">T-Shirt</span> in the tool bar and
+                        place it in one of the red targets. </p>
+                    <p>Fill all four targets. Click Ok to start.</p>
+                </div>
+                <div id="level1-image" class="level-image">
+                    <img id="dragAnim" width="100%" src="images/dragAnim.gif" data-gamelevel="level1"
+                        draggable="false" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump1"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level1-ok" class="ok-button" data-gamelevel="level1">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="level2" data-group=0 class="level-dialog level2" data-title="Rotate">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level2-text" class="level-text">
+                    <p> <b>Lesson 3:</b></p>
+                    <p>Drag four <span style="white-space:nowrap">T-Shirts</span> into the puzzle space</p>
+                    <p>This time you'll have to rotate them to fit.</p>
+                    <div class"table">
+                        <div class="table-row">
+                            <div class="table-cell table-cell-bold">R</div>
+                            <div class="table-cell">rotate counter-clockwise</div>
+                        </div>
+                        <div class="table-row">
+                            <div class="table-cell table-cell-bold">T</div>
+                            <div class="table-cell">rotate clockwise</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="level2-image" class="level-image">
+                    <img width="100%" src="images/rotateAnim.gif" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump2"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level2-ok" class="ok-button" data-gamelevel="level2">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="level3" data-group=0 class="level-dialog level3" data-title="Flip">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level3-text" class="level-text">
+                    <p> <b>Lesson 4:</b></p>
+                    <p>These puzzle pieces can be flipped over, upside down, making a mirror image, or
+                        what mathematicians call a reflection.</p>
+                    <p>'<b>F</b>' will flip upside-down, and press '<b>F</b>' again to get back right-side up.</p>
+                    <p>One key insight to the <span style="white-space:nowrap">T-Shirts</span> Puzzle is that very
+                        few <span style="white-space:nowrap">T-Shirts</span> are ever flipped over to the blue side.</p>
+                </div>
+                <div id="level3-image" class="level-image">
+                    <img width="100%" src="images/flipAnimationBlueWhite.gif" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump3"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level3-ok" class="ok-button" data-gamelevel="level3">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="level4" data-group=0 class="level-dialog level4" data-title="New Tools">
+        <P align="left">Congratulations, you've earned some new tools to make things easier.
+            Select more than one <span style="white-space:nowrap">T-Shirt</span> by shift-clicking. Double click quickly
+            selects all
+            <span style="white-space:nowrap">T-Shirts</span> contiguous with the one double-clicked.
+            Continue to drag selected <span style="white-space:nowrap">T-Shirts</span>
+            or move the selection using the arrow keys. Zoom In using the = or + keys, zoom out using - or _. To delete
+            the selection, press x.
+            Of course T and R continue to rotate the selection and F continues to Flip it.
+        </P>
+        <div class="level-content">
+            <div id="level4-text" class="level-text">
+                <p><b>Click</b>: Select a <span style="white-space:nowrap">T-Shirt</span>
+                <p><b>Shift-Click</b>: Shift-click to add or remove a <span style="white-space:nowrap">T-Shirt</span>
+                    from the selection.
+                <p><b>Double-Click</b>: Select all contiguous <span style="white-space:nowrap">T-Shirts</span>.
+                    </b></p>
+                <p><b>Arrows</b>: Move selected <span style="white-space:nowrap">T-Shirts</span> up, down, left or
+                    right.</p>
+                <p><b>-</b> or <b>_</b>: Zoom out</p>
+                <p><b>=</b> or <b>+</b>: Zoom in</p>
+                <p><b>x</b>: Delete selected <span style="white-space:nowrap">T-Shirts</span></p>
+                <p><b>T</b> and <b>R</b>:</b> Rotate selected <span style="white-space:nowrap">T-Shirts</span> clockwise
+                    or counter clockwise</p>
+                <p><b>F</b>: Flip selected <span style="white-space:nowrap">T-Shirts</span></p>
+                <p>
+                    <font color="red">
+                        Try out the new commands then click the ? to return here and continue to the <a
+                            href=puzzle.html?level=5>next lesson.</a>
+                    </font>
+                </p>
+            </div>
+        </div>
+        <div class="ok-button-row">
+            <a href="learningMore.html">Learn more</a>
+            <div id="jump4"></div>
+            <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+            <button id="level4-ok" class="ok-button" data-gamelevel="level4">OK</button>
+        </div>
+    </div>
+    <div id="level5" data-group=0 class="level-dialog level5" data-title="Bad Pairings">
+        <p align="left">There are over 190 unique ways to connect just two <span
+                style="white-space:nowrap">T-Shirts</span>
+            with each other. You may have noticed some pairings cause problems now, or down-the-line.</p>
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level5-text" class="level-text">
+                    <p> <b>Lesson 5:</b></p>
+                    <p>Some pairings will leave gaps that are impossible to fill, for example.</p>
+                    <P>See if you can take 6 <span style="white-space:nowrap">T-Shirts</span> and construct 3 pairs of
+                        <span style="white-space:nowrap">T-Shirts</span> each with a distinct small gap
+                        between them.
+                    </P>
+                    <p>Connect one pair neck-to-neck (as shown), another neck-to-armpit, and a third armpit-to-armpit.
+                    </p>
+                    <p>Click the Hint-light bulb if you want more help.</p>
+                </div>
+                <div id="level5-image" class="level-image">
+                    <img width="100%" src="images/badNeighborWithHint.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump5"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level5-ok" class="ok-button" data-gamelevel="level5">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level6" data-group=0 class="level-dialog level6" data-title="Congratulations!">
+        <p align="left">You've earned the 'bad pairing' flag! It isn't always obvious when two neighbors are poorly
+            arranged, but the red flag will alert you.</p>
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level6-text" class="level-text">
+                    <p> <b>Bonus!</b></p>
+                    <p>From now on, if you connect two <span style="white-space:nowrap">T-Shirts</span> in any of 13
+                        known bad pairings,
+                        you will see a red X appear in the middle of each T-Shirt, warning you to change one or both of
+                        them.</p>
+                    <p>You can see all known bad pairings <a
+                            href="file:///Users/genemckenna/src/tshirt/more/allBadNeighbors.png">here</a>.</p>
+                    <p>You are now ready for the First Challenge!</p>
+                </div>
+                <div id="level6-image" class="level-image">
+                    <img width="100%" src="images/impossibleGaps.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump6"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level6-ok" class="ok-button" data-gamelevel="level6">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level7" data-group=0 class="level-dialog level7" data-title="1st Challenge Level!">
+        <p align="left">You have all the basic tools: add, move, rotate & flip.
+            Now, see if you can completely "tile" (cover with no gaps) the area inside the black rectangle.</P>
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level7-text" class="level-text">
+                    <p> <b>Challenge Level</b></p>
+                    <p>Warning: you haven't had strategy lessons yet, so this will be very hard. But it can be good to
+                        see why it's so hard. </p>
+                    <p>
+                        <font color="red">If you want to stop and come back to this guided lesson-by-lesson approach,
+                            click on the big ? to return here. You can <a href="puzzle.html?level=8">skip the
+                                challenge</a>
+                            and proceed with the intermediate lessons.</font>
+                    </p>
+                </div>
+                <div id="level7-image" class="level-image">
+                    <img width="100%" src="images/tryIt.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump7"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level7-ok" class="ok-button" data-gamelevel="level7">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level8" data-group=1 class="level-dialog level8" data-title="The Cluster">
+        <p align="left">"The Cluster" is an important (and often used) grouping of four <span
+                style="white-space:nowrap">T-Shirts</span>. </p>
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level8-text" class="level-text">
+                    <p> <b>Lesson 6:</b></p>
+                    <p>Flip one <span style="white-space:nowrap">T-Shirt</span> over to the blue side, then surround it
+                        as completely as possible with 3
+                        non-flipped (white) <span style="white-space:nowrap">T-Shirts</span></p>
+                    <p> To successfully tile an area with <span style="white-space:nowrap">T-Shirts</span>, flipped
+                        tiles must always be surrounded exactly like this.</p>
+                    <P> Also, notice how a Cluster forms a rough triangle as shown by the purpline lines.</p>
+                    <p> Click the Hint lightbulb for more help.</p>
+                </div>
+                <div id="level8-image" class="level-image">
+                    <img width="100%" src="images/cluster.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump8"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="leve8-ok" class="ok-button" data-gamelevel="level8">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level9" data-group=1 class="level-dialog level9" data-title="A Multi-Cluster">
+        <p align="left">Now you can really make progress by seeing larger shapes within the puzzle.</p>
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level9-text" class="level-text">
+                    <p> <b>Lesson 7:</b></p>
+                    <p>Using the new Cluster tool, see if you can layout three Clusters to form a rough triangle with
+                        one <span style="white-space:nowrap">T-Shirt</span> between them.</p>
+                    <p>Notice the new style of hints with just a rough shape. These are key to seeing patterns later.
+                        The arrows help with orientation, indicating where the <span
+                            style="white-space:nowrap">T-Shirts</span> can exceed the shape's boundary.
+                        Detailed hints are still available, just keep clicking the lightbulb.</p>
+                    <p>If you need more room to see, collapse the tool tray.</p>
+                </div>
+                <div id="level9-image" class="level-image">
+                    <img width="100%" src="images/multiClusterWithTray.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump9"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level9-ok" class="ok-button" data-gamelevel="level9">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level10" data-group=1 class="level-dialog level10" data-title="The Buddies">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level10-text" class="level-text">
+                    <p> <b>Lesson 8:</b></p>
+                    <p>The next common combination is a simple one. It involves just two, regular, (non-flipped)
+                        <span style="white-space:nowrap">T-Shirts</span>.
+                    </p>
+                    <p>Connect two <span style="white-space:nowrap">T-Shirts</span> side-by-side so they share 4 points.
+                        It will look like two buddies, arm-in-arm.</p>
+                    <p>Just like life, Buddies are very common. In fact, every <span
+                            style="white-space:nowrap">T-Shirt</span> should
+                        be part of a Buddy pair, with just two exceptions:</p>
+                    <ol>
+                        <li>if it's part of a <a href="puzzle.html?level=8">Cluster</a>,
+                        <li>if it's the single, lone <span style="white-space:nowrap">T-Shirt</span> surrounded by three
+                            Clusters like we saw <a href="puzzle.html?level=9">here</a>.
+                    </ol>
+                </div>
+                <div id="level10-image" class="level-image">
+                    <img width="100%" src="images/pals.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump10"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level10-ok" class="ok-button" data-gamelevel="level10">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level11" data-group=1 class="level-dialog level11" data-title="Triskelions!">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level11-text" class="level-text">
+                    <p> <b>Lesson 9:</b></p>
+                    <p>Buddies are the glue connecting Clusters to form larger super clusters.</p>
+                    <p>Often between Clusters we see lines of Buddies like those in yellow here. These lines
+                        branch out at 120 degree angles from each other. </p>
+                    <P>Where three buddies meet together in a three-armed propeller shape, it's called a
+                        <i>triskelion</i>.
+                    </p>
+                    <p>Use the new Buddies tool to quickly create lines of Buddies joined in a <i>triskelion</i>.</p>
+                    <p>Depending on placement, some Buddies that don't connect just right to a line will be colored
+                        white
+                        instead. More about that <a href="puzzle.html?level=12">later</a>.
+                    </p>
+                </div>
+                <div id="level11-image" class="level-image">
+                    <img width="100%" src="images/sidekicklines.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump11"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level11-ok" class="ok-button" data-gamelevel="level11">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level12" data-group=1 class="level-dialog level12" data-title="Two Types of Buddies">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level12-text" class="level-text">
+                    <p> <b>Lesson 10:</b></p>
+                    <p> When three pairs of Buddies meet, arms locked, in a rotation like this, it is called a
+                        <i>triskelion</i>.
+                        Each of the three Buddies is called a <i>triskelion leg</i>. On large, completed puzzles you
+                        will often
+                        see <i>triskelions</i> connecting long chains of Buddies.
+                    </p>
+                    <p> When two Buddies instead meet "armhole to sleevetop", it prevents the three-way branching. This
+                        type of pairing will be referred to as "disjoint".
+                    <p> Both <i>triskelion legs</i> and <i>disjoint</i> Buddies are identical if you see them in
+                        isolation. It is how
+                        they connect to other Buddies that determines their status.</p>
+                </div>
+                <div id="level12-image" class="level-image">
+                    <img width="100%" src="images/fylfot.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump12"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level12-ok" class="ok-button" data-gamelevel="level12">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level13" data-group=1 class="level-dialog level13" data-title="New Styles">
+        <P align="left">Congratulations, you've earned some new styles to mix things up artistically if you like.</P>
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level13-text" class="level-text">
+                    <P> Press the C key to switch between 3 different color palettes and press the G key to switch between
+                        different <span style="white-space:nowrap">T-Shirt</span> designs including plain white,
+                        kite-outline and a new Penrose Curve style developed by
+                        <a href="https://www.youtube.com/watch?v=nzsAIRontAA">Pembesita on YouTube</a>.
+                    </P>
+                    <p><b>C</b>: Cycle through three different color palette's</p>
+                    <p><b>G</b>: Cycle through three different <span style="white-space:nowrap">T-Shirt</span> styles</p>
+                    <p><b>D</b>: Toggle on/off the dots at the hexagonal grid points</p>
+                    <p> <font color="red"> Try out the new commands then click the ? to return here and continue to the
+                        <a href="puzzle.html?level=14">next lesson.</a>
+                        </font> </p>
+                </div>
+                <div id="level13-image" class="level-image">
+                    <img width="100%" src="images/newstyle.png"/>
+                </div>
+            </div>
+
+        </div>
+        <div class="ok-button-row">
+            <a href="learningMore.html">Learn more</a>
+            <div id="jump13"></div>
+            <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+            <button id="level13-ok" class="ok-button" data-gamelevel="level13">OK</button>
+        </div>
+    </div>
+    <div id="level14" data-group=1 class="level-dialog level14" data-title="2nd Challenge Level">
+        <p align="left"> <b>Challenge Level:</b></p>
+        <div class="level-content">
+            <div class="x">
+                <div id="level14-text" class="y">
+                    <p align="left">So far you've learned a few pretty useful things. Let's review.</p>
+                    <P align="left"><b>Avoid Bad Pairings:</b> If you put two tiles together in a way that leaves a gap
+                        that can't be filled,
+                        you'll get a red X warning on both <span style="white-space:nowrap">T-Shirts</span>. </P>
+                    <P align="left"><b>Only Flip In a Cluster</b> Only about 14.5% of the time (or 1/phi^4) will
+                        you ever flip a <span style="white-space:nowrap">T-Shirt</span>. And when you do, it should
+                        be surrounded in a very specific way to form the Cluster. Never flip a single
+                        <span style="white-space:nowrap">T-Shirt</span> over.
+                    </p>
+                    <P align="left"><b>It's Mostly Buddies and Clusters</b>
+                        Even fewer <span style="white-space:nowrap">T-Shirts</span> will be lone
+                        (non-Buddies, non-Cluster) <span style="white-space:nowrap">T-Shirts</span>.
+                        The only time you should place a single, white T will be when you have three clusters
+                        surrounding it, like you did in <a href=puzzle.html?level=9>lesson 7</a>. </P>
+                    <P align="left"><b>Buddies Surround Everything</b> Buddies are the glue that hold things together.
+                        Generally every Cluster or Multi-Cluster is surrounded by Buddies.</P>
+                    <P align="left">Hint: <b>Start with a Multi-Cluster, Then Surround It With Buddies</b>!</P>
+                    <P align="left">Click "Ok" to take this challenge. Now see if you can completely cover the area
+                        inside the black rectangle with <span style="white-space:nowrap">T-Shirts</span>. It will still
+                        be
+                        quite challenging, but flex your skills. Or go to the <a href="puzzle.html?level=15">next
+                            lesson</a>
+                        to begin advanced lessons on higher level strategies.</P>
+                    </P>
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump14"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level14-ok" class="ok-button" data-gamelevel="level14">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level15" data-group=2 class="level-dialog level15" data-title="A Symbolic Language">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level15-text" class="level-text">
+                    <p><b>Lesson 11:</b></p>
+                    <p>Tiling <span style="white-space:nowrap">T-Shirts</span> in large numbers requires seeing
+                        patterns at different scales. But mathematicians have proven you will never find a pattern of
+                        <span style="white-space:nowrap">T-Shirts</span> no matter how large an area you tile.
+                    </p>
+                    <p>So, how is it possible? It turns out, there is a pattern of symbolic shapes one can substitute
+                        for actual <span style="white-space:nowrap">T-Shirts</span>.
+                        The shapes have a pattern, even if the <span style="white-space:nowrap">T-Shirts</span> don't.
+                    </P>
+                    <P>Let's learn the symbols, starting with the Single T whose symbol is a triangle.</p>
+                    <P>Arrows along one edge are for orientation. They indicate the side where two consecutive kites of
+                        the
+                        <span style="white-space:nowrap">T-Shirt</span> will poke out.
+                    </p>
+                    <p>Buddies have two symbols: when used in a <i>triskelion</i> they're presented as a pointed,
+                        triskelion leg.
+                        When not used in this arrangement, their symbol is a parallelogram.</p>
+                    <p>And lastly, the Cluster's symbol is an irregular hexagon.</p>
+                </div>
+                <div id="level15-image" class="level-image">
+                    <img width="100%" src="images/atomicSymbols.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump15"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level15-ok" class="ok-button" data-gamelevel="level15">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level16" data-group=2 class="level-dialog level16" data-title="Those Little Arrows">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level16-text" class="level-text">
+                    <p> <b>An Important Detail:</b></p>
+                    <p align="left">
+                        Before moving on, we want to focus for a moment on the little arrows in the shapes we just
+                        learned. Without the
+                        arrows, we can't tell which way the T, H or P shapes need to be rotated in order to fit together
+                        properly. The
+                        F shape, with it's point clearly tells which way it is rotated. </p>
+                    <p align="left">
+                        In each case, the arrows indicate the side on which two adjacent kites poke through the shape.
+                    </p>
+                    <p align="left">
+                        This small distinction not only helps with knowing which way to rotate the shapes, but also
+                        shows a very interesting
+                        property present at any scaling of the <span style="white-space:nowrap">T-Shirts</span> made
+                        through this process.
+                        You can look all around a large group of <span style="white-space:nowrap">T-Shirts</span> and
+                        you will
+                        notice all of the <span style="white-space:nowrap">T-Shirts</span> point inwards, except one
+                        <span style="white-space:nowrap">T-Shirt</span>, in one P-shape, on the outside edge will be
+                        pointing outward.
+                    </p>
+                </div>
+                <div id="level16-image" class="level-image">
+                    <img width="100%" src="images/consecutiveOutwardFacingKites.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump16"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level16-ok" class="ok-button" data-gamelevel="level16">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level17" data-group=2 class="level-dialog level17" data-title="Triangle Scaling">
+        <p align="left">We scale up to more <span style="white-space:nowrap">T-Shirts</span> by substituting one of the
+            four basic symbols you just learned for
+            larger combinations of the same basic, four symbols. For example, start with the <b>triangle</b> symbol. As
+            we scale up to a <b>large triangle</b>, the substitution is
+            very simple.</p>
+        </p>
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level17-text" class="level-text">
+                    <p> <b>Lesson 12:</b></p>
+                    <p> The <span style="white-space:nowrap">T-Shirts</span> that best fit a <b>small triangle</b> is a
+                        single <span style="white-space:nowrap">T-Shirt</span>.</p>
+                    <p> The <span style="white-space:nowrap">T-Shirts</span> that best fit a <b>large triangle</b> are
+                        those forming the Cluster.</p>
+                    <p> So to grow from a <b>small triangle</b> to a <b>large triangle</b>, just replace the single
+                        <span style="white-space:nowrap">T-Shirt</span> with the Cluster.
+                    </p>
+                    <p> Generally the larger shapes are exactly the same shape as their smaller versions. In this case a
+                        <b>large triangle</b> and an <b>irregular hexagon</b>
+                        are used somewhat interchangeably because they are very similar. Even mathematicians are a
+                        little poetic.
+                    </p>
+                </div>
+                <div id="level17-image" class="level-image">
+                    <img width="100%" src="images/triangleScalingAnim.gif" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump17"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level17-ok" class="ok-button" data-gamelevel="level17">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level18" data-group=2 class="level-dialog level18" data-title="Triangle Super Scaling">
+        <div class="level-content">
+            <p align="left">Now a more complex one. We saw how a <b>small triangle</b> scaled up to a <b>large
+                    triangle</b>.
+                Now the <b>large triangle</b> scales to a <b>super triangle</b> with the substition rules shown below.
+            </p>
+            <div class="level-text-image">
+                <div id="level18-text" class="level-text">
+                    <p> <b>Lesson 13:</b></p>
+                    <p> The best fit for a <b>small triangle</b> was one <span
+                            style="white-space:nowrap">T-Shirt</span>.</p>
+                    <p> The best fit for a <b>large triangle</b> (or an <b>irregular hexagon</b>) was the Cluster. </p>
+                    <p> The <b>super triangle</b> is filled with familiar shapes. It has three <b>irregular hexagons</b>
+                        (always filled by a Cluster), and one <b>small triangle</b> between them, (a single <span
+                            style="white-space:nowrap">T-Shirt</span>).</p>
+                    <p> The clusters are surrounded by six Buddies, three of which can go on to form <i>triskelions</i>
+                        and are represented by the <b>triskelion leg</b> shape, and three of
+                        which are disjoint, represented by <b>parallelograms</b>. </p>
+                    <p> Note one disjoint Buddy pair on the right is colored yellow. It's not yet clearly disjoint
+                        or part of a <i>triskelion</i> but will be truly disjoint (and white) as we scale up more. Also
+                        notice, it is the only one of the six buddy pairs pointing outward.</p>
+                </div>
+                <div id="level18-image" class="level-image">
+                    <img width="100%" src="images/triangleSuperScaling.gif" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump18"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level18-ok" class="ok-button" data-gamelevel="level18">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level19" data-group=2 class="level-dialog level19" data-title="Parallelogram Scaling">
+        <p align="left">You probably noticed that within the <b>super triangle</b> there were <b>parallograms</b> and
+            <b>triskelion legs</b>. If you guessed we have to learn how to scale those as well, you are right.
+        </p>
+
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level19-text" class="level-text">
+                    <p> <b>Lesson 14:</b></p>
+                    <p>The <b>parallelogram</b> scales up to a <b>large parallelogram</b> through these substition
+                        rules.</p>
+                    <p>Two <b>irregular hexagons</b>, filled with Clusters, are placed side-by-side.</p>
+                    <p>One <b>parallelogram</b> sits between them. The <b>parallogram</b> shape is filled with a
+                        disjoint
+                        Buddy pair. This Buddy doesn't know it's disjoint yet, so it's colored yellow, but it will be
+                        clearly disjoint when we scale up further and it connects to other Buddies. Then it will be
+                        colored
+                        white.</p>
+                    <p>The Clusters are flanked on the outside by one <b>triskelion leg</b> on each side. These are also
+                        filled with Buddies.</p>
+                </div>
+                <div id="level19-image" class="level-image">
+                    <img width="100%" src="images/parallelogramScaling.gif" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump19"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level19-ok" class="ok-button" data-gamelevel="level19">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level20" data-group=2 class="level-dialog level20" data-title="Triskelion Leg Scaling">
+
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level20-text" class="level-text">
+                    <p> <b>Lesson 15:</b></p>
+                    <p>And now the final scaling substituion rule for <b>triskelion legs</b>.</p>
+                    <p>This one is remarkably similar to the last. Do you see the difference?</p>
+                </div>
+                <div id="level20-image" class="level-image">
+                    <img width="100%" src="images/fylfotScaling.gif" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump20"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level20-ok" class="ok-button" data-gamelevel="level20">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level21" data-group=2 class="level-dialog level21" data-title="Geometric Recursion - H4">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level21-text" class="level-text">
+                    <p> <b>Lesson 15:</b></p>
+                    <p> That brings us to the last lesson. Now that you know the geometric substitutions, it's really
+                        just a matter of applying them "recursively". This means repeatedly applying the substition
+                        rules
+                        through successive generations.</p>
+                    </p> For example, start with a shape, like the "H", or <b>irregular hexagon</b>. Then apply the
+                    subsitution rules.</p>
+                    This gives you a new shape composed of smaller shapes (H,T,P and F) we'll call the children of the
+                    starting shape.
+                    Then apply the substituion rules to the children giving another generation of shapes
+                    - the grandchildren. Then apply the rules to the grandchildren and great-grandchildren
+                    for as many generations as desired. At the end, put actual <span
+                        style="white-space:nowrap">T-Shirts</span>
+                    inside the last generation of shapes.
+                    </p>
+                    <p> On this final lesson, the system will lay out the <span
+                            style="white-space:nowrap">T-Shirts</span>
+                        for you. You've earned it! The system will create an "H" and recursively generate its
+                        descendents
+                        for 4 generations and then fill those great-great-great-grand children with <span
+                            style="white-space:nowrap">T-Shirts</span>
+                    </p>
+                    <p> Press keys <b>1,2,3</b> or <b>4</b> to toggle on/off the SuperTile shapes at that generation
+                        number.</p>
+                    <p> Press the '<b>z</b>' key to toggle on/off the <span style="white-space:nowrap">T-Shirts</span>.
+                    </p>
+                </div>
+                <div id="level21-image" class="level-image">
+                    <img width="100%" src="images/5LayerSuperTileAnimSlow.gif" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump21"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level21-ok" class="ok-button" data-gamelevel="level21">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level22" data-group=2 class="level-dialog level22" data-title="Geometric Recursion - P5">
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level22-text" class="level-text">
+                    <p> <b>Lesson 16:</b></p>
+                    <p> Similar to the previous lesson, the computer will do the work here. This one begins with the
+                        <b>P</b> or Parallelogram
+                        shape and then applies the recursive substition rules through 5 generations.
+                    <p> Press keys <b>1,2,3,4</b> or <b>5</b> to toggle on/off the SuperTile shapes at that generation
+                        number.</p>
+                    <p> Press the '<b>z</b>' key to toggle on/off the <span style="white-space:nowrap">T-Shirts</span>.
+                    </p>
+                    <p> Reminder, you can zoom in/out with - and = keys.
+                    <p> And definitely cycle through the color palettes <b>C</b> and cycle through grid line/curve
+                        patterns with <b>G</b></p>
+                </div>
+                <div id="level22-image" class="level-image">
+                    <img width="100%" src="images/p5Anim.gif" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump22"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level22-ok" class="ok-button" data-gamelevel="level22">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="level23" data-group=2 class="level-dialog level23" data-title="T-Shirt Playground">
+        <p>Now you can start with just an empty puzzle canvas and play. Enjoy.</p>
+        <div class="level-content">
+            <div class="level-text-image">
+                <div id="level23-text" class="level-text">
+                    <p><b>Arrows:</b> Move selected <span style="white-space:nowrap">T-Shirts</span> up, down, left or
+                        right.</p>
+                    <p><b>R or T</b>:</b> Rotate selected <span style="white-space:nowrap">T-Shirts</span> CCW or CW</p>
+                    <p><b>F:</b> Flip selected <span style="white-space:nowrap">T-Shirts</span></p>
+                    <p><b>+,-</b> Zoom in/out</p>
+                    <p><b>x</b> Delete selected <span style="white-space:nowrap">T-Shirts</span></p>
+                    <p<b>Shift-Click</b> Add to selection</p>
+                        <p><b>Double Click</b> Select all contiguous
+                        <p><b>Ctrl/Cmd - C:</b> Copy selected</p>
+                        <p><b>Ctrl/Cmd - V:</b> Paste selected</p>
+                        <p><b>C</b> Change color palette</p>
+                        <p><b>G</b> Grid lines: hidden, hexagonal kites or Penrose curves</p>
+                        <p><b>D</b> Show/hide hexagonal grid dots</p>
+                        <p>Save and Load via the buttons in the toolbard</p>
+                </div>
+                <div id="level23-image" class="level-image">
+                    <img width="100%" src="images/Tblue.png" />
+                </div>
+            </div>
+            <div class="ok-button-row">
+                <a href="learningMore.html">Learn more</a>
+                <div id="jump23"></div>
+                <!-- the data-gamelevel value here must match the id of the level-dialog class this is part of-->
+                <button id="level23-ok" class="ok-button" data-gamelevel="level23">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add more divs for each level as needed -->
+
+    <script src="boundingbox.js?v=1.3.9"></script>
+    <script src="tshirt.js?v=1.3.9"></script>
+    <script src="selection.js?v=1.3.9"></script>
+    <script src="level.js?v=1.3.9"></script>
+    <script src="superTile.js?v=1.3.9"></script>
+    <script src="shape.js?v=1.3.9"></script>
+    <script src="puzzle.js?v=1.3.9"></script>
+    <script src="game.js?v=1.3.9"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</body>
+
+</html>

@@ -28,7 +28,9 @@ class Puzzle {
             surround: 'SkyBlue',
             disjoint: 'white',
             sideKick: 'yellow',
-            background: 'seashell'
+            background: 'seashell',
+            outline: 'black'
+
         },
         {
             top: '#a32a22',
@@ -38,6 +40,29 @@ class Puzzle {
             disjoint: '#f4d3a8',
             sideKick: '#e4b33f',
             background: 'white',
+            outline: 'black'
+        },
+        { // blue/purple flipped, with very light grey/white other shirts and light grey outlines, used with penrose styling grid
+            top: '#d3d4fc',
+            default: '#f0e5fd',
+            bottom: '#f0e5fd',
+            surround: '#f0e5fd',
+            disjoint: '#f0e5fd',
+            sideKick: '#f0e5fd',
+            background: 'white',
+            outline: 'lightgrey',
+            styling: '#6b47c2'
+        }, 
+        { // magenta flipped, with very light grey/white other shirts and light grey outlines, used with penrose styling grid
+            top: '#f9d8e2',
+            default: '#f0e5ed',
+            bottom: '#f0e5ed',
+            surround: '#f0e5ed',
+            disjoint: '#f0e5ed',
+            sideKick: '#f0e5ed',
+            background: 'white',
+            outline: 'lightgrey',
+            styling: '#cf2c73'
         }
     ];
 
@@ -86,6 +111,7 @@ class Puzzle {
         this.guide = null;
         this.autoDrawShape = null;
         this.autoDrawLevel = null;
+        this.showSuperTiles = false;
         this.superTileLevelIsOn = [];
         this.drawTShirts = true;
 
@@ -104,7 +130,7 @@ class Puzzle {
         this.mouseIsDown = false;
 
         // display related stuff
-        this.SHOW_KITES = -1;
+        this.SHOW_KITES = 0;
         this.SHOW_HEX_DOTS = 1;
 
         // supertile alignment
@@ -118,6 +144,7 @@ class Puzzle {
         this.T2Super = [];
         this.superTileRoot = null;
         this.SUPERTILE_DRAW_SUPPRESSION = false;
+        this.TMO = false ; 
     }
 
     getNumberOfTShirts() { return this.tshirts.size; }
@@ -140,10 +167,11 @@ class Puzzle {
     }
 
     resetPuzzle(gridSize, buffer, zoom, palette, targets,
-        showBadNeighbors, showSurround, showSideKick, showKites, autoDrawShape, autoDrawLevel, showHintsDefault,
+        showBadNeighbors, showSurround, showSideKick, kiteStyle, autoDrawShape, autoDrawLevel, showSuperTiles, showHintsDefault,
         showMetaHints) {
         //console.log("Puzzle.resetPuzzle()");
         this.tshirtColors = palette;
+        this.SHOW_KITES = kiteStyle;
         this.hexCenterCols = gridSize.x;
         this.hexCenterRows = gridSize.y;
         this.drawTShirts = true;
@@ -166,9 +194,9 @@ class Puzzle {
         this.showBadNeighbors = showBadNeighbors;
         this.showSurround = showSurround;
         this.showSideKick = showSideKick;
-        this.SHOW_KITES = showKites ? 1 : -1;
         this.autoDrawShape = autoDrawShape;
         this.autoDrawLevel = autoDrawLevel;
+        this.showSuperTiles = showSuperTiles; // independent of do we autodraw t-shirts, do we show the super tile shapes?
         if (autoDrawShape && autoDrawLevel) {
             this.superTileRoot = SuperTile.generateSuperTile(autoDrawShape, autoDrawLevel, SuperTile.NORTH_EAST);
             this.superTileLevelIsOn[autoDrawLevel] = true;
@@ -286,12 +314,13 @@ class Puzzle {
 
 
         // 
-        // Rotate and flip buttons
+        // lower tray buttons
         //
         const cwBtn = document.getElementById('rotateCW');
         const ccwBtn = document.getElementById('rotateCCW');
         const flipBtn = document.getElementById('flip');
         const gridBtn = document.getElementById('grid');
+        const colorBtn = document.getElementById('color');
         const dotsBtn = document.getElementById('dots');
         const zoomInBtn = document.getElementById('zoomIn');
         const zoomOutBtn = document.getElementById('zoomOut');
@@ -299,6 +328,7 @@ class Puzzle {
         ccwBtn.addEventListener('click', this.onRotateCCW.bind(this));
         flipBtn.addEventListener('click', this.doFlip.bind(this));
         gridBtn.addEventListener('click', this.toggleGrid.bind(this));
+        colorBtn.addEventListener('click', this.cyclePalette.bind(this));
         dotsBtn.addEventListener('click', this.toggleDots.bind(this));
         zoomInBtn.addEventListener('click', this.zoomIn.bind(this));
         zoomOutBtn.addEventListener('click', this.zoomOut.bind(this));
@@ -350,11 +380,10 @@ class Puzzle {
     }
 
     displaySettings() {
-        console.log("display settings sk=" + this.SHOW_KITES + " sd=" + this.SHOW_HEX_DOTS);
         this.settingsDialog.style.display = 'flex';
         if (this.SHOW_HEX_DOTS == 1) { this.hexDotsCheckBox.checked = true; }
         else { this.hexDotsCheckBox.checked = false; }
-        if (this.SHOW_KITES == 1) { this.gridLinesCheckBox.checked = true; }
+        if (this.SHOW_KITES != 0) { this.gridLinesCheckBox.checked = true; }
         else { this.gridLinesCheckBox.checked = false; }
     }
 
@@ -884,6 +913,7 @@ class Puzzle {
     drawSuperTiles(st) {
         if (!st) { return; }
         if (!st.childArray || st.childArray.length == 0 || !st.visible) { return; }
+        if( !this.showSuperTiles ) { return ; }
         for (const t of st.childArray) {
             this.drawSuperTiles(t);
         }
@@ -990,9 +1020,14 @@ class Puzzle {
     }
 
     toggleGrid() {
-        this.SHOW_KITES = this.SHOW_KITES * -1;
-        if (this.SHOW_KITES == 1) { this.gridLinesCheckBox.checked = true; }
+        this.SHOW_KITES = (this.SHOW_KITES+1)%3;
+        if (this.SHOW_KITES != 0) { this.gridLinesCheckBox.checked = true; }
         else { this.gridLinesCheckBox.checked = false; }
+        this.fullRedraw();
+    }
+    cyclePalette() {
+        this.paletteIndex++;
+        this.tshirtColors = Puzzle.palette[this.paletteIndex % Puzzle.palette.length];
         this.fullRedraw();
     }
     toggleDots() {
@@ -1173,7 +1208,7 @@ class Puzzle {
     }
 
     isGridMoveValid(dx, dy) {
-        console.log("is grid move valid");
+        //console.log("is grid move valid");
         if (this.selection.size() == 0) { return; }
         // now we have to move all of them together or none at all. 
         const keyTshirt = this.selection.getMinSelection();
@@ -1196,7 +1231,7 @@ class Puzzle {
             const blockT = this.areKitesOccupied(tshirt, kites);
             if (blockT) { blockingTs.add(blockT); }
         }
-        console.log("done checking result is blockingTs.size=" + blockingTs.size);
+        //console.log("done checking result is blockingTs.size=" + blockingTs.size);
         if (blockingTs.size > 0) {
             for (let b of blockingTs) { b.rattle(this.showSurround, this.showSideKick); }
             return false;
@@ -2041,7 +2076,7 @@ class Puzzle {
         this.fullRedraw();
     }
     onGridLinesToggle() {
-        this.SHOW_KITES = this.SHOW_KITES * -1;
+        this.SHOW_KITES = (this.SHOW_KITES+1)%3;
         this.fullRedraw();
     }
     onHexDotsToggle() {
@@ -2119,9 +2154,7 @@ class Puzzle {
                     this.zoom(999); // kind of a hack, special number to reset zoom to 1
                     break;
                 case "c":
-                    this.paletteIndex++;
-                    this.tshirtColors = Puzzle.palette[this.paletteIndex % Puzzle.palette.length];
-                    this.fullRedraw();
+                    this.cyclePalette();
                     break;
                 case "i":
                     console.log("selection:" + this.selection.logInfo());
@@ -2147,16 +2180,40 @@ class Puzzle {
                 case "5":
                     this.toggleSTLevel(5);
                     break;
-                case "6":
-                    this.toggleSTLevel(6);
-                    break;
                 case "z":
                     this.toggleSTLevel(0);
+                    break;
+                case "*":
+                    this.tmo();
                     break;
             }
         }
     }
 
+    /* easter egg */
+    tmo() { 
+        if(!this.TMO) { 
+            this.SHOW_KITES == 0;
+            this.SHOW_HEX_DOTS = -1;
+            this.tshirtColors = {
+                //top: '#cf2c72',  // this is the actual color measured by photoshop
+                top: '#e01073', // if i use this color, what i get out will be close to the above (measured by photoshop) 
+                default: 'white',
+                bottom: 'white',
+                surround: 'white',
+                disjoint: 'white',
+                sideKick: 'white',
+                background: 'white',
+                outline: 'black'
+            }
+            this.TMO=true;
+        }
+        else { 
+            this.TMO=false; 
+            this.tshirtColors = Puzzle.palette[0];
+        }
+        this.fullRedraw();
+    }
 
     toggleSuperTileDrawLevel(level) {
         if (this.autoDrawShape) {
@@ -2204,7 +2261,7 @@ class Puzzle {
      * 
      */
     onDoubleClick(event) {
-        console.time("onDoubleClick");
+        //console.time("onDoubleClick");
         // for every t-shirt in the selection, find its neighbors
         for (let t of this.selection.getSelection()) {
             this.selectNeighbors(t);
@@ -2213,7 +2270,7 @@ class Puzzle {
             this.redoWorkAreas([this.selection.generateBBox()]);
             this.completedMove();
         }
-        console.timeEnd("onDoubleClick");
+        //console.timeEnd("onDoubleClick");
     }
 
     selectNeighbors(t) {
